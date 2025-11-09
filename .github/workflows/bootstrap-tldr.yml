@@ -2,10 +2,9 @@ name: Bootstrap TLDR vendor
 
 permissions:
   contents: write
-  pull-requests: write
 
 on:
-  workflow_dispatch: {}   # запускаем вручную
+  workflow_dispatch: {}   # запускается вручную из Actions
 
 jobs:
   fetch:
@@ -16,66 +15,50 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Show branch info (debug)
-        run: |
-          echo "GITHUB_REF_NAME=${GITHUB_REF_NAME}"
-          git branch -a
-          git remote -v
-
       - name: Prepare dirs
+        shell: bash
         run: |
+          set -euxo pipefail
           mkdir -p vendor/tldr .state notes
           [ -f .state/idx ] || echo 1 > .state/idx
 
       - name: Download TLDR archive
+        shell: bash
         run: |
+          set -euxo pipefail
           curl -fsSL https://tldr.sh/assets/tldr.zip -o /tmp/tldr.zip
           unzip -o /tmp/tldr.zip -d /tmp/tldr
-          rsync -a --delete /tmp/tldr/pages/linux/  vendor/tldr/pages/linux/  || true
-          rsync -a --delete /tmp/tldr/pages/common/ vendor/tldr/pages/common/ || true
+          mkdir -p vendor/tldr/pages/linux vendor/tldr/pages/common
+          cp -R /tmp/tldr/pages/linux/*  vendor/tldr/pages/linux/  || true
+          cp -R /tmp/tldr/pages/common/* vendor/tldr/pages/common/ || true
 
       - name: Verify files exist (debug)
+        shell: bash
         run: |
-          set -e
-          echo "Listing some files:"
-          ls -la vendor/tldr/pages/linux | head || true
+          set -euxo pipefail
+          ls -la vendor/tldr/pages/linux  | head || true
           ls -la vendor/tldr/pages/common | head || true
 
       - name: Build deterministic file list
+        shell: bash
         run: |
+          set -euxo pipefail
           find vendor/tldr/pages/common -type f -name '*.md' > /tmp/all.txt || true
           find vendor/tldr/pages/linux  -type f -name '*.md' >> /tmp/all.txt || true
           awk -F/ '{print $NF "|" $0}' /tmp/all.txt | sort -f | cut -d"|" -f2 > .state/files.list
           echo "Total files: $(wc -l < .state/files.list)"
 
-      - name: Commit locally
+      - name: Commit & push to main
+        env:
+          GH_TOKEN: ${{ secrets.PAT }}   # см. примечание ниже
+        shell: bash
         run: |
-          git config user.name "Vlad Levinas"
+          set -euxo pipefail
+          git config user.name  "Vlad Levinas"
           git config user.email "vladimir@dbits.lt"
           git add vendor/tldr .state/files.list
-          git status --porcelain
           git commit -m "chore: bootstrap TLDR vendor & file list" || echo "Nothing new to commit"
-
-      - name: Try fast-forward push to main
-        id: push_direct
-        continue-on-error: true
-        env:
-          GH_TOKEN: ${{ secrets.PAT }}
-        run: |
           BRANCH=${GITHUB_REF_NAME:-main}
           git fetch origin $BRANCH
           git pull --rebase origin $BRANCH || true
           git push https://$GH_TOKEN@github.com/${{ github.repository }} HEAD:$BRANCH
-
-      - name: Fallback: create PR if direct push failed
-        if: steps.push_direct.outcome != 'success'
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.PAT }}
-          commit-message: "chore: bootstrap TLDR vendor & file list"
-          branch: "bootstrap/tldr-init"
-          title: "Bootstrap TLDR vendor & file list"
-          body: |
-            Автоматический импорт TLDR (linux + common) и генерация .state/files.list.
-            Если прямой push недоступен (политики/гонка коммитов), смёржьте этот PR.
-          base: main
