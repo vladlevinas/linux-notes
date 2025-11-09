@@ -1,10 +1,10 @@
-name: Bootstrap TLDR vendor
+name: Bootstrap TLDR (Linux only)
 
 permissions:
   contents: write
 
 on:
-  workflow_dispatch: {}   # запускается вручную из Actions
+  workflow_dispatch: {}   # ручной запуск из Actions
 
 jobs:
   fetch:
@@ -15,49 +15,40 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Prepare dirs
-        shell: bash
+      - name: Prepare directories
         run: |
           set -euxo pipefail
-          mkdir -p vendor/tldr .state notes
+          mkdir -p vendor/tldr/pages/linux .state notes
           [ -f .state/idx ] || echo 1 > .state/idx
 
-      - name: Download TLDR archive
-        shell: bash
+      - name: Download TLDR (Linux pages only)
         run: |
           set -euxo pipefail
           curl -fsSL https://tldr.sh/assets/tldr.zip -o /tmp/tldr.zip
           unzip -o /tmp/tldr.zip -d /tmp/tldr
-          mkdir -p vendor/tldr/pages/linux vendor/tldr/pages/common
-          cp -R /tmp/tldr/pages/linux/*  vendor/tldr/pages/linux/  || true
-          cp -R /tmp/tldr/pages/common/* vendor/tldr/pages/common/ || true
+          rsync -a --delete /tmp/tldr/pages/linux/ vendor/tldr/pages/linux/
 
-      - name: Verify files exist (debug)
-        shell: bash
+      - name: Verify downloaded files
         run: |
-          set -euxo pipefail
-          ls -la vendor/tldr/pages/linux  | head || true
-          ls -la vendor/tldr/pages/common | head || true
+          echo "Preview first 10 pages:"
+          ls -la vendor/tldr/pages/linux | head
+          echo "Total count:"
+          find vendor/tldr/pages/linux -type f | wc -l
 
-      - name: Build deterministic file list
-        shell: bash
+      - name: Build list of files
         run: |
-          set -euxo pipefail
-          find vendor/tldr/pages/common -type f -name '*.md' > /tmp/all.txt || true
-          find vendor/tldr/pages/linux  -type f -name '*.md' >> /tmp/all.txt || true
-          awk -F/ '{print $NF "|" $0}' /tmp/all.txt | sort -f | cut -d"|" -f2 > .state/files.list
-          echo "Total files: $(wc -l < .state/files.list)"
+          find vendor/tldr/pages/linux -type f -name '*.md' > .state/files.list
+          echo "Total pages: $(wc -l < .state/files.list)"
 
       - name: Commit & push to main
         env:
-          GH_TOKEN: ${{ secrets.PAT }}   # см. примечание ниже
-        shell: bash
+          GH_TOKEN: ${{ secrets.PAT }}
         run: |
           set -euxo pipefail
           git config user.name  "Vlad Levinas"
           git config user.email "vladimir@dbits.lt"
-          git add vendor/tldr .state/files.list
-          git commit -m "chore: bootstrap TLDR vendor & file list" || echo "Nothing new to commit"
+          git add vendor/tldr/pages/linux .state/files.list
+          git commit -m "chore: import TLDR Linux pages" || echo "Nothing new to commit"
           BRANCH=${GITHUB_REF_NAME:-main}
           git fetch origin $BRANCH
           git pull --rebase origin $BRANCH || true
