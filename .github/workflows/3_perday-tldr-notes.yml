@@ -5,9 +5,8 @@ permissions:
 
 on:
   schedule:
-    # 09:00, 15:00, 21:00 по Вильнюсу ≈ 07:00, 13:00, 19:00 UTC
-    - cron: "0 7,13,19 * * *"
-  workflow_dispatch: {}  # можно запустить вручную
+    - cron: "0 7,13,19 * * *"   # 09:00, 15:00, 21:00 Vilnius time
+  workflow_dispatch: {}
 
 jobs:
   publish:
@@ -19,18 +18,18 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Ensure state and build file list
+      - name: Ensure state and file list
         run: |
           set -euxo pipefail
           mkdir -p .state notes
           [ -f .state/idx ] || echo 1 > .state/idx
 
           if [ ! -s .state/files.list ]; then
-            echo "Building combined file list..."
+            echo "Building TLDR list..."
             find vendor/tldr/pages/linux  -type f -name '*.md' > /tmp/linux.txt  || true
             find vendor/tldr/pages/common -type f -name '*.md' > /tmp/common.txt || true
             cat /tmp/linux.txt /tmp/common.txt | awk -F/ '{print $NF "|" $0}' | sort -f | cut -d"|" -f2 > .state/files.list
-            echo "File list created: $(wc -l < .state/files.list) files"
+            echo "Total TLDR files: $(wc -l < .state/files.list)"
           fi
 
       - name: Pick next TLDR page
@@ -38,13 +37,32 @@ jobs:
         shell: bash
         run: |
           set -euxo pipefail
-
           IDX=$(tr -d '\r' < .state/idx)
           TOTAL=$(wc -l < .state/files.list | tr -d ' ')
-          if [ "$IDX" -gt "$TOTAL" ]; then
-            IDX=1
-          fi
+          if [ "$IDX" -gt "$TOTAL" ]; then IDX=1; fi
 
           SRC=$(sed -n "${IDX}p" .state/files.list)
           BASENAME=$(basename "$SRC")
-          NAME="${BASENAME%.
+          NAME="${BASENAME%.md}"
+          DEST="notes/${NAME}.md"
+
+          echo "# $NAME" > "$DEST"
+          echo "" >> "$DEST"
+          echo "> Source: TLDR (MIT) — from \`vendor/tldr/\`" >> "$DEST"
+          echo "" >> "$DEST"
+          cat "$SRC" >> "$DEST"
+          echo "" >> "$DEST"
+          echo "---" >> "$DEST"
+          echo "_Imported: $(date -u +'%Y-%m-%d %H:%M:%S') UTC_" >> "$DEST"
+
+          NEXT=$((IDX + 1))
+          echo "$NEXT" > .state/idx
+
+          # Обновляем README в корне
+          {
+            echo "# 📘 TLDR Notes Index"
+            echo
+            echo "🕒 **Last updated:** $(date -u +'%Y-%m-%d %H:%M:%S') UTC"
+            echo
+            echo "📦 **Total notes:** $(ls notes/*.md 2>/dev/null | wc -l) / $TOTAL"
+            echo
