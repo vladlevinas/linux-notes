@@ -5,93 +5,30 @@ permissions:
 
 on:
   schedule:
-    # 09:00, 15:00, 21:00 по Вильнюсу ≈ 07:00, 13:00, 19:00 UTC
+    # Время UTC — для Вильнюса (UTC+2 зимой, +3 летом)
+    # значит 09:00, 15:00, 21:00 Вильнюс = 07:00, 13:00, 19:00 UTC
     - cron: "0 7,13,19 * * *"
   workflow_dispatch: {}  # можно запустить вручную
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Ensure state and build file list
+      - name: Ensure state and file list
         run: |
           set -euxo pipefail
           mkdir -p .state notes
           [ -f .state/idx ] || echo 1 > .state/idx
 
+          # если нет списка, создаём объединённый (linux + common)
           if [ ! -s .state/files.list ]; then
-            echo "Building combined TLDR file list..."
+            echo "Building combined file list..."
             find vendor/tldr/pages/linux  -type f -name '*.md' > /tmp/linux.txt  || true
             find vendor/tldr/pages/common -type f -name '*.md' > /tmp/common.txt || true
             cat /tmp/linux.txt /tmp/common.txt | awk -F/ '{print $NF "|" $0}' | sort -f | cut -d"|" -f2 > .state/files.list
-            echo "Total TLDR files: $(wc -l < .state/files.list)"
-          fi
-
-      - name: Pick next TLDR page
-        id: pick
-        shell: bash
-        run: |
-          set -euxo pipefail
-          IDX=$(tr -d '\r' < .state/idx)
-          TOTAL=$(wc -l < .state/files.list | tr -d ' ')
-          if [ "$IDX" -gt "$TOTAL" ]; then
-            IDX=1
-          fi
-
-          SRC=$(sed -n "${IDX}p" .state/files.list)
-          BASENAME=$(basename "$SRC")
-          NAME="${BASENAME%.md}"
-          DEST="notes/${NAME}.md"
-
-          echo "# ${NAME}" > "$DEST"
-          echo "" >> "$DEST"
-          echo "> Source: TLDR (MIT) — from \`vendor/tldr/\`" >> "$DEST"
-          echo "" >> "$DEST"
-          cat "$SRC" >> "$DEST"
-          echo "" >> "$DEST"
-          echo "---" >> "$DEST"
-          echo "_Imported: $(date -u +'%Y-%m-%d %H:%M:%S') UTC_" >> "$DEST"
-
-          NEXT=$((IDX + 1))
-          echo "$NEXT" > .state/idx
-
-          # 🧠 создаём README в корне (НЕ в notes/)
-          {
-            echo "# 📘 TLDR Notes Index"
-            echo
-            echo "🕒 **Last updated:** $(date -u +'%Y-%m-%d %H:%M:%S') UTC"
-            echo
-            echo "📦 **Total notes:** $(ls notes/*.md 2>/dev/null | wc -l) / $TOTAL"
-            echo
-            echo "----"
-            echo
-            echo "## 📚 List of Notes"
-            echo
-            for f in notes/*.md; do
-              TITLE=$(head -n1 "$f" | sed 's/^# //')
-              FILE=$(basename "$f")
-              echo "- [$TITLE](notes/$FILE)"
-            done | sort -f
-            echo
-            echo "_Next run (Vilnius): 09:00 / 15:00 / 21:00_"
-          } > README.md
-
-          echo "name=$NAME" >> $GITHUB_OUTPUT
-          echo "total=$TOTAL" >> $GITHUB_OUTPUT
-          echo "index=$IDX"  >> $GITHUB_OUTPUT
-
-      - name: Commit & push
-        env:
-          GH_TOKEN: ${{ secrets.PAT }}
-        run: |
-          set -euxo pipefail
-          git config user.name "Vlad Levinas"
-          git config user.email "vladimir@dbits.lt"
-          git add .state/idx notes/ README.md
-          git commit -m "🕒 TLDR note #${{ steps.pick.outputs.index }} of ${{ steps.pick.outputs.total }} — '${{ steps.pick.outputs.name }}'" || echo "Nothing new to c
+            echo "Total TLDR files: $(wc -l < .
