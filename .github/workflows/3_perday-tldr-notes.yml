@@ -5,39 +5,40 @@ permissions:
 
 on:
   schedule:
-    # Время UTC — для Вильнюса (UTC+2 зимой, +3 летом)
-    # значит 09:00, 15:00, 21:00 Вильнюс = 07:00, 13:00, 19:00 UTC
+    # 09:00, 15:00, 21:00 по Вильнюсу ≈ 07:00, 13:00, 19:00 UTC
     - cron: "0 7,13,19 * * *"
   workflow_dispatch: {}  # можно запустить вручную
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Ensure state and file list
+      - name: Ensure state and build file list
         run: |
           set -euxo pipefail
           mkdir -p .state notes
           [ -f .state/idx ] || echo 1 > .state/idx
 
-          # если нет списка, создаём объединённый (linux + common)
           if [ ! -s .state/files.list ]; then
             echo "Building combined file list..."
             find vendor/tldr/pages/linux  -type f -name '*.md' > /tmp/linux.txt  || true
             find vendor/tldr/pages/common -type f -name '*.md' > /tmp/common.txt || true
             cat /tmp/linux.txt /tmp/common.txt | awk -F/ '{print $NF "|" $0}' | sort -f | cut -d"|" -f2 > .state/files.list
+            echo "File list created: $(wc -l < .state/files.list) files"
           fi
 
-      - name: Pick next page
+      - name: Pick next TLDR page
         id: pick
         shell: bash
         run: |
           set -euxo pipefail
+
           IDX=$(tr -d '\r' < .state/idx)
           TOTAL=$(wc -l < .state/files.list | tr -d ' ')
           if [ "$IDX" -gt "$TOTAL" ]; then
@@ -45,52 +46,5 @@ jobs:
           fi
 
           SRC=$(sed -n "${IDX}p" .state/files.list)
-          BASENAME=$(basename "$SRC")          # ls.md
-          NAME="${BASENAME%.md}"               # ls
-          DEST="notes/${NAME}.md"
-
-          {
-            echo "# ${NAME}"
-            echo
-            echo "> Source: TLDR (MIT) — from \`vendor/tldr/\`"
-            echo
-            cat "$SRC"
-            echo
-            echo "---"
-            echo "_Imported: $(date -u +'%Y-%m-%d %H:%M:%S') UTC_"
-          } > "$DEST"
-
-          NEXT=$((IDX + 1))
-          echo "$NEXT" > .state/idx
-
-          # Пересоздаём индекс заметок
-          {
-            echo "# Список заметок по Linux-командам"
-            echo
-            COUNT=0
-            for f in notes/*.md; do
-              TITLE=$(head -n1 "$f" | sed 's/^# //')
-              COUNT=$((COUNT + 1))
-              echo "- [$COUNT. $TITLE]($f)"
-            done | sort -f
-            echo
-            echo "_Last updated: $(date -u +'%Y-%m-%d %H:%M:%S') UTC_"
-          } > notes/README.md
-
-          echo "name=$NAME" >> $GITHUB_OUTPUT
-          echo "total=$TOTAL" >> $GITHUB_OUTPUT
-          echo "index=$IDX"  >> $GITHUB_OUTPUT
-
-      - name: Commit & push
-        env:
-          GH_TOKEN: ${{ secrets.PAT }}
-        run: |
-          set -euxo pipefail
-          git config user.name "Vlad Levinas"
-          git config user.email "vladimir@dbits.lt"
-          git add .state/idx notes/
-          git commit -m "🕒 TLDR note #${{ steps.pick.outputs.index }} of ${{ steps.pick.outputs.total }} — '${{ steps.pick.outputs.name }}'" || echo "Nothing new to commit"
-          BRANCH=${GITHUB_REF_NAME:-main}
-          git fetch origin $BRANCH
-          git pull --rebase origin $BRANCH || true
-          git push https://$GH_TOKEN@github.com/${{ github.repository }} HEAD:$BRANCH
+          BASENAME=$(basename "$SRC")
+          NAME="${BASENAME%.
