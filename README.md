@@ -6,5 +6,6 @@
 - [4. imv](notes/imv.md)
 - [5. turbostat](notes/turbostat.md)
 - [6. urpme](notes/urpme.md)
+- [7. xbps](notes/xbps.md)
 
-_Last updated: 2025-11-10 07:22:52 UTC_
+_Last updated: 2025-11-10 13:34:26 UTC_
