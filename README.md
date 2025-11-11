@@ -1,13 +1,14 @@
 # 📘 Список заметок по Linux-командам
 
 - [1. Список заметок по Linux-командам](notes/README.md)
-- [2. edit](notes/edit.md)
-- [3. grub-install](notes/grub-install.md)
-- [4. imv](notes/imv.md)
-- [5. logrotate](notes/logrotate.md)
-- [6. turbostat](notes/turbostat.md)
-- [7. update-alternatives](notes/update-alternatives.md)
-- [8. urpme](notes/urpme.md)
-- [9. xbps](notes/xbps.md)
+- [10. xbps](notes/xbps.md)
+- [2. dphys-swapfile](notes/dphys-swapfile.md)
+- [3. edit](notes/edit.md)
+- [4. grub-install](notes/grub-install.md)
+- [5. imv](notes/imv.md)
+- [6. logrotate](notes/logrotate.md)
+- [7. turbostat](notes/turbostat.md)
+- [8. update-alternatives](notes/update-alternatives.md)
+- [9. urpme](notes/urpme.md)
 
-_Last updated: 2025-11-11 07:23:44 UTC_
+_Last updated: 2025-11-11 13:33:53 UTC_
