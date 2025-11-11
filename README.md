@@ -6,7 +6,8 @@
 - [4. imv](notes/imv.md)
 - [5. logrotate](notes/logrotate.md)
 - [6. turbostat](notes/turbostat.md)
-- [7. urpme](notes/urpme.md)
-- [8. xbps](notes/xbps.md)
+- [7. update-alternatives](notes/update-alternatives.md)
+- [8. urpme](notes/urpme.md)
+- [9. xbps](notes/xbps.md)
 
-_Last updated: 2025-11-10 19:19:27 UTC_
+_Last updated: 2025-11-11 07:23:44 UTC_
