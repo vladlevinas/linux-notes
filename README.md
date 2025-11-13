@@ -6,6 +6,7 @@
 - [12. urpme](notes/urpme.md)
 - [13. wami](notes/wami.md)
 - [14. xbps](notes/xbps.md)
+- [15. ydotool](notes/ydotool.md)
 - [2. archinstall](notes/archinstall.md)
 - [3. dphys-swapfile](notes/dphys-swapfile.md)
 - [4. dpkg-query](notes/dpkg-query.md)
@@ -15,4 +16,4 @@
 - [8. imv](notes/imv.md)
 - [9. logrotate](notes/logrotate.md)
 
-_Last updated: 2025-11-12 19:20:24 UTC_
+_Last updated: 2025-11-13 07:23:12 UTC_
