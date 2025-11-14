@@ -3,13 +3,14 @@
 - [1. Список заметок по Linux-командам](notes/README.md)
 - [10. logwatch](notes/logwatch.md)
 - [11. lvmsadc](notes/lvmsadc.md)
-- [12. systemd-ac-power](notes/systemd-ac-power.md)
-- [13. turbostat](notes/turbostat.md)
-- [14. update-alternatives](notes/update-alternatives.md)
-- [15. urpme](notes/urpme.md)
-- [16. wami](notes/wami.md)
-- [17. xbps](notes/xbps.md)
-- [18. ydotool](notes/ydotool.md)
+- [12. pdftohtml](notes/pdftohtml.md)
+- [13. systemd-ac-power](notes/systemd-ac-power.md)
+- [14. turbostat](notes/turbostat.md)
+- [15. update-alternatives](notes/update-alternatives.md)
+- [16. urpme](notes/urpme.md)
+- [17. wami](notes/wami.md)
+- [18. xbps](notes/xbps.md)
+- [19. ydotool](notes/ydotool.md)
 - [2. archinstall](notes/archinstall.md)
 - [3. dphys-swapfile](notes/dphys-swapfile.md)
 - [4. dpkg-query](notes/dpkg-query.md)
@@ -19,4 +20,4 @@
 - [8. imv](notes/imv.md)
 - [9. logrotate](notes/logrotate.md)
 
-_Last updated: 2025-11-14 07:23:03 UTC_
+_Last updated: 2025-11-14 13:32:59 UTC_
