@@ -18,8 +18,9 @@
 - [23. update-alternatives](notes/update-alternatives.md)
 - [24. urpme](notes/urpme.md)
 - [25. wami](notes/wami.md)
-- [26. xbps](notes/xbps.md)
-- [27. ydotool](notes/ydotool.md)
+- [26. waydroid](notes/waydroid.md)
+- [27. xbps](notes/xbps.md)
+- [28. ydotool](notes/ydotool.md)
 - [3. ascii](notes/ascii.md)
 - [4. caffeinate](notes/caffeinate.md)
 - [5. chpasswd](notes/chpasswd.md)
@@ -28,4 +29,4 @@
 - [8. dpkg-query](notes/dpkg-query.md)
 - [9. edit](notes/edit.md)
 
-_Last updated: 2025-11-17 07:23:55 UTC_
+_Last updated: 2025-11-17 13:34:53 UTC_
