@@ -30,16 +30,17 @@
 - [34. update-alternatives](notes/update-alternatives.md)
 - [35. urpme](notes/urpme.md)
 - [36. utmpdump](notes/utmpdump.md)
-- [37. vrms](notes/vrms.md)
-- [38. wami](notes/wami.md)
-- [39. waydroid](notes/waydroid.md)
+- [37. vivaldi-stable](notes/vivaldi-stable.md)
+- [38. vrms](notes/vrms.md)
+- [39. wami](notes/wami.md)
 - [4. ark](notes/ark.md)
-- [40. xbps](notes/xbps.md)
-- [41. ydotool](notes/ydotool.md)
+- [40. waydroid](notes/waydroid.md)
+- [41. xbps](notes/xbps.md)
+- [42. ydotool](notes/ydotool.md)
 - [5. ascii](notes/ascii.md)
 - [6. caffeinate](notes/caffeinate.md)
 - [7. chpasswd](notes/chpasswd.md)
 - [8. cockpit-ws](notes/cockpit-ws.md)
 - [9. dphys-swapfile](notes/dphys-swapfile.md)
 
-_Last updated: 2025-11-21 19:19:49 UTC_
+_Last updated: 2025-11-22 07:21:01 UTC_
