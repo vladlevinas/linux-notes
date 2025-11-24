@@ -42,11 +42,12 @@
 - [45. wami](notes/wami.md)
 - [46. waydroid](notes/waydroid.md)
 - [47. xbps](notes/xbps.md)
-- [48. ydotool](notes/ydotool.md)
+- [48. xdp-filter](notes/xdp-filter.md)
+- [49. ydotool](notes/ydotool.md)
 - [5. ascii](notes/ascii.md)
 - [6. caffeinate](notes/caffeinate.md)
 - [7. chpasswd](notes/chpasswd.md)
 - [8. cockpit-ws](notes/cockpit-ws.md)
 - [9. dphys-swapfile](notes/dphys-swapfile.md)
 
-_Last updated: 2025-11-24 07:24:09 UTC_
+_Last updated: 2025-11-24 13:36:16 UTC_
