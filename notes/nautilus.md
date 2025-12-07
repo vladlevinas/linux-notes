@@ -1,0 +1,41 @@
+# nautilus
+
+> Source: TLDR (MIT) — from 'vendor/tldr/'
+
+# nautilus
+
+> Default file explorer for GNOME desktop environment.
+> Also known as GNOME Files.
+> See also: `dolphin`, `caja`, `thunar`, `vifm`.
+> More information: <https://manned.org/nautilus>.
+
+- Launch Nautilus:
+
+`nautilus`
+
+- Launch Nautilus as root user:
+
+`nautilus admin:/`
+
+- Launch Nautilus and display a specific directory:
+
+`nautilus {{path/to/directory}}`
+
+- Launch Nautilus with a specific file or directory selected:
+
+`nautilus --select {{path/to/file_or_directory}}`
+
+- Launch Nautilus in a separated window:
+
+`nautilus --new-window`
+
+- Close all Nautilus instances:
+
+`nautilus --quit`
+
+- Display help:
+
+`nautilus --help`
+
+---
+_Imported: 2025-12-07 13:28:25 UTC_
