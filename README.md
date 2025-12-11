@@ -2,7 +2,8 @@
 
 - [1. Список заметок по Linux-командам](notes/README.md)
 - [10. auditctl](notes/auditctl.md)
-- [100. ydotool](notes/ydotool.md)
+- [100. xdp-filter](notes/xdp-filter.md)
+- [101. ydotool](notes/ydotool.md)
 - [11. aurvote](notes/aurvote.md)
 - [12. bootctl](notes/bootctl.md)
 - [13. btrbk](notes/btrbk.md)
@@ -98,7 +99,7 @@
 - [95. vrms](notes/vrms.md)
 - [96. wami](notes/wami.md)
 - [97. waydroid](notes/waydroid.md)
-- [98. xbps](notes/xbps.md)
-- [99. xdp-filter](notes/xdp-filter.md)
+- [98. whiptail](notes/whiptail.md)
+- [99. xbps](notes/xbps.md)
 
-_Last updated: 2025-12-11 13:42:23 UTC_
+_Last updated: 2025-12-11 19:23:53 UTC_
