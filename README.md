@@ -6,7 +6,8 @@
 - [101. whiptail](notes/whiptail.md)
 - [102. xbps](notes/xbps.md)
 - [103. xdp-filter](notes/xdp-filter.md)
-- [104. ydotool](notes/ydotool.md)
+- [104. xwinwrap](notes/xwinwrap.md)
+- [105. ydotool](notes/ydotool.md)
 - [11. aurvote](notes/aurvote.md)
 - [12. bootctl](notes/bootctl.md)
 - [13. btrbk](notes/btrbk.md)
@@ -105,4 +106,4 @@
 - [98. vrms](notes/vrms.md)
 - [99. wami](notes/wami.md)
 
-_Last updated: 2025-12-12 19:20:35 UTC_
+_Last updated: 2025-12-13 07:25:53 UTC_
