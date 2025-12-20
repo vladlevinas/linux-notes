@@ -30,8 +30,9 @@
 - [123. whiptail](notes/whiptail.md)
 - [124. xbps](notes/xbps.md)
 - [125. xdp-filter](notes/xdp-filter.md)
-- [126. xwinwrap](notes/xwinwrap.md)
-- [127. ydotool](notes/ydotool.md)
+- [126. xed](notes/xed.md)
+- [127. xwinwrap](notes/xwinwrap.md)
+- [128. ydotool](notes/ydotool.md)
 - [13. bootctl](notes/bootctl.md)
 - [14. btrbk](notes/btrbk.md)
 - [15. caffeinate](notes/caffeinate.md)
@@ -128,4 +129,4 @@
 - [98. systemctl-is-failed](notes/systemctl-is-failed.md)
 - [99. systemctl-list-dependencies](notes/systemctl-list-dependencies.md)
 
-_Last updated: 2025-12-20 13:30:16 UTC_
+_Last updated: 2025-12-20 19:19:01 UTC_
