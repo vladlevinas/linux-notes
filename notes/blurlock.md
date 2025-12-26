@@ -1,0 +1,28 @@
+# blurlock
+
+> Source: TLDR (MIT) — from 'vendor/tldr/'
+
+# blurlock
+
+> A simple wrapper around the i3 screen locker `i3lock`, which blurs the screen.
+> See also: `i3lock`.
+> More information: <https://gitlab.manjaro.org/packages/community/i3/i3exit/-/blob/master/blurlock>.
+
+- Lock the screen to a blurred screenshot of the current screen:
+
+`blurlock`
+
+- Lock the screen and disable the unlock indicator (removes feedback on keypress):
+
+`blurlock {{[-u|--no-unlock-indicator]}}`
+
+- Lock the screen and don't hide the mouse pointer:
+
+`blurlock {{[-p|--pointer]}} {{default}}`
+
+- Lock the screen and show the number of failed login attempts:
+
+`blurlock {{[-f|--show-failed-attempts]}}`
+
+---
+_Imported: 2025-12-26 07:26:05 UTC_
