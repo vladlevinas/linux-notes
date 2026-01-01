@@ -68,8 +68,9 @@
 - [158. xdp-filter](notes/xdp-filter.md)
 - [159. xed](notes/xed.md)
 - [16. bmon](notes/bmon.md)
-- [160. xwinwrap](notes/xwinwrap.md)
-- [161. ydotool](notes/ydotool.md)
+- [160. xhost](notes/xhost.md)
+- [161. xwinwrap](notes/xwinwrap.md)
+- [162. ydotool](notes/ydotool.md)
 - [17. bootctl](notes/bootctl.md)
 - [18. btrbk](notes/btrbk.md)
 - [19. caffeinate](notes/caffeinate.md)
@@ -162,4 +163,4 @@
 - [98. pdbedit](notes/pdbedit.md)
 - [99. pdftohtml](notes/pdftohtml.md)
 
-_Last updated: 2025-12-31 19:19:24 UTC_
+_Last updated: 2026-01-01 07:27:18 UTC_
