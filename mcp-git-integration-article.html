@@ -1,0 +1,1865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building an MCP Server: Integrating Gitea/GitHub with Claude</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #2a2a2a;
+            --text-primary: #f5f5f5;
+            --text-secondary: #a0a0a0;
+            --accent-primary: #00ff88;
+            --accent-secondary: #0088ff;
+            --accent-tertiary: #ff0088;
+            --border: #333;
+            --shadow: rgba(0, 255, 136, 0.1);
+        }
+        
+        body {
+            font-family: 'Crimson Pro', serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.8;
+            font-size: 18px;
+            overflow-x: hidden;
+        }
+        
+        /* Animated grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, var(--border) 1px, transparent 1px),
+                linear-gradient(var(--border) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.03;
+            z-index: -1;
+            animation: gridPulse 20s ease-in-out infinite;
+        }
+        
+        @keyframes gridPulse {
+            0%, 100% { opacity: 0.03; }
+            50% { opacity: 0.06; }
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 80px 40px;
+            position: relative;
+        }
+        
+        /* Header */
+        header {
+            margin-bottom: 100px;
+            position: relative;
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .header-meta {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-primary);
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+        
+        .header-meta span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .header-meta span::before {
+            content: '';
+            display: block;
+            width: 6px;
+            height: 6px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-primary);
+        }
+        
+        h1 {
+            font-size: 72px;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+        
+        .subtitle {
+            font-size: 24px;
+            color: var(--text-secondary);
+            font-weight: 300;
+            max-width: 700px;
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+        
+        /* Table of Contents */
+        .toc {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent-primary);
+            padding: 40px;
+            margin: 60px 0;
+            border-radius: 2px;
+            animation: fadeInUp 1s ease-out 0.8s both;
+        }
+        
+        .toc h2 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 25px;
+            color: var(--accent-primary);
+            font-family: 'IBM Plex Mono', monospace;
+        }
+        
+        .toc ol {
+            list-style: none;
+            counter-reset: toc-counter;
+        }
+        
+        .toc li {
+            counter-increment: toc-counter;
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 40px;
+        }
+        
+        .toc li::before {
+            content: counter(toc-counter, decimal-leading-zero);
+            position: absolute;
+            left: 0;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            color: var(--accent-secondary);
+            font-weight: 600;
+        }
+        
+        .toc a {
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        
+        .toc a:hover {
+            color: var(--accent-primary);
+            transform: translateX(5px);
+        }
+        
+        /* Content sections */
+        section {
+            margin: 80px 0;
+            animation: fadeInUp 1s ease-out both;
+            animation-delay: calc(var(--index) * 0.1s);
+        }
+        
+        h2 {
+            font-size: 42px;
+            font-weight: 700;
+            margin: 80px 0 30px 0;
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        h2::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 60%;
+            background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary));
+            box-shadow: 0 0 20px var(--accent-primary);
+        }
+        
+        h3 {
+            font-size: 28px;
+            font-weight: 600;
+            margin: 50px 0 20px 0;
+            color: var(--accent-primary);
+        }
+        
+        h4 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 30px 0 15px 0;
+            font-family: 'IBM Plex Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 14px;
+            color: var(--accent-secondary);
+        }
+        
+        p {
+            margin: 20px 0;
+            color: var(--text-secondary);
+        }
+        
+        strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        /* Code blocks */
+        pre {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 30px;
+            margin: 30px 0;
+            overflow-x: auto;
+            position: relative;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        pre::before {
+            content: attr(data-lang);
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-primary);
+            opacity: 0.5;
+        }
+        
+        code {
+            font-family: 'IBM Plex Mono', monospace;
+            background: var(--bg-tertiary);
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 16px;
+            color: var(--accent-primary);
+        }
+        
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--text-secondary);
+        }
+        
+        /* Lists */
+        ul, ol {
+            margin: 20px 0;
+            padding-left: 30px;
+        }
+        
+        li {
+            margin: 15px 0;
+            color: var(--text-secondary);
+        }
+        
+        li::marker {
+            color: var(--accent-primary);
+        }
+        
+        /* Info boxes */
+        .info-box {
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--accent-secondary);
+            padding: 30px;
+            margin: 40px 0;
+            border-radius: 2px;
+            position: relative;
+        }
+        
+        .info-box::before {
+            content: 'ℹ';
+            position: absolute;
+            top: 30px;
+            left: -2px;
+            width: 30px;
+            height: 30px;
+            background: var(--accent-secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 0 20px var(--accent-secondary);
+        }
+        
+        .warning-box {
+            border-left-color: var(--accent-tertiary);
+        }
+        
+        .warning-box::before {
+            content: '⚠';
+            background: var(--accent-tertiary);
+            box-shadow: 0 0 20px var(--accent-tertiary);
+        }
+        
+        .success-box {
+            border-left-color: var(--accent-primary);
+        }
+        
+        .success-box::before {
+            content: '✓';
+            background: var(--accent-primary);
+            box-shadow: 0 0 20px var(--accent-primary);
+        }
+        
+        /* Diagrams */
+        .diagram {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 40px;
+            margin: 40px 0;
+            border-radius: 4px;
+            text-align: center;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+        }
+        
+        .diagram-title {
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-primary);
+            margin-bottom: 30px;
+            font-size: 12px;
+        }
+        
+        /* Footer */
+        footer {
+            margin-top: 120px;
+            padding-top: 60px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .author {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        
+        /* Animations */
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 20px var(--accent-primary);
+            }
+            50% {
+                box-shadow: 0 0 40px var(--accent-primary);
+            }
+        }
+        
+        /* Links */
+        a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        
+        a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: var(--accent-primary);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+            transform-origin: right;
+        }
+        
+        a:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 20px;
+            }
+            
+            h1 {
+                font-size: 48px;
+            }
+            
+            h2 {
+                font-size: 32px;
+            }
+            
+            .subtitle {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-meta">
+                <span>Technical Guide</span>
+                <span>January 2026</span>
+                <span>20 min read</span>
+            </div>
+            <h1>Building an MCP Server: Integrating Gitea/GitHub with Claude</h1>
+            <p class="subtitle">A comprehensive guide to creating a production-ready Model Context Protocol server that connects Claude AI with Git platforms for seamless GitOps automation.</p>
+        </header>
+
+        <nav class="toc">
+            <h2>Table of Contents</h2>
+            <ol>
+                <li><a href="#introduction">Introduction to MCP</a></li>
+                <li><a href="#architecture">Architecture Overview</a></li>
+                <li><a href="#prerequisites">Prerequisites & Setup</a></li>
+                <li><a href="#project-structure">Project Structure</a></li>
+                <li><a href="#implementation">Core Implementation</a></li>
+                <li><a href="#api-integration">Git Platform API Integration</a></li>
+                <li><a href="#tools">Defining MCP Tools</a></li>
+                <li><a href="#handlers">Request Handlers</a></li>
+                <li><a href="#error-handling">Error Handling & Security</a></li>
+                <li><a href="#testing">Testing & Deployment</a></li>
+                <li><a href="#claude-integration">Claude Desktop Integration</a></li>
+                <li><a href="#real-world">Real-World Usage Examples</a></li>
+            </ol>
+        </nav>
+
+        <section id="introduction" style="--index: 1">
+            <h2>Introduction to MCP</h2>
+            
+            <p>The <strong>Model Context Protocol (MCP)</strong> is Anthropic's open standard for connecting AI assistants like Claude to external data sources and tools. Think of it as a universal adapter that allows Claude to seamlessly interact with your development infrastructure.</p>
+
+            <div class="info-box">
+                <p><strong>Why MCP matters:</strong> Instead of Claude being limited to its training data and built-in capabilities, MCP servers extend Claude's reach to real-time systems, databases, APIs, and tools. This transforms Claude from a conversational assistant into an active participant in your workflows.</p>
+            </div>
+
+            <h3>What We're Building</h3>
+            
+            <p>In this guide, we'll build a production-grade MCP server that connects Claude to Git platforms (Gitea/GitHub). Once integrated, Claude will be able to:</p>
+            
+            <ul>
+                <li>Create, read, update, and delete files in repositories</li>
+                <li>Manage branches and create pull requests</li>
+                <li>Automate Git operations with natural language commands</li>
+                <li>Enable true GitOps workflows where Claude commits infrastructure changes directly</li>
+            </ul>
+
+            <p>This isn't just a proof-of-concept. The server we build will be <strong>production-ready</strong>, with proper error handling, TypeScript type safety, logging, and security best practices.</p>
+        </section>
+
+        <section id="architecture" style="--index: 2">
+            <h2>Architecture Overview</h2>
+
+            <div class="diagram">
+                <div class="diagram-title">MCP Server Architecture</div>
+                <pre style="text-align: left; background: none; border: none; padding: 0;">
+┌─────────────────────┐
+│   Claude Desktop    │
+│   (Windows/Mac)     │
+└──────────┬──────────┘
+           │
+           │ MCP Protocol (stdio)
+           │
+┌──────────▼──────────────┐
+│   MCP Server            │
+│   (TypeScript/Node.js)  │
+│                         │
+│  ┌──────────────────┐   │
+│  │ Tool Definitions │   │
+│  └──────────────────┘   │
+│  ┌──────────────────┐   │
+│  │ Request Handlers │   │
+│  └──────────────────┘   │
+│  ┌──────────────────┐   │
+│  │   API Client     │   │
+│  └──────────────────┘   │
+└──────────┬──────────────┘
+           │
+           │ HTTPS REST API
+           │
+┌──────────▼──────────────┐
+│   Gitea/GitHub          │
+│   Git Platform          │
+└─────────────────────────┘
+                </pre>
+            </div>
+
+            <h3>Component Breakdown</h3>
+
+            <h4>1. Claude Desktop</h4>
+            <p>The client application that users interact with. It discovers and connects to MCP servers via configuration files.</p>
+
+            <h4>2. MCP Server</h4>
+            <p>Your custom server implementation. It receives requests from Claude, processes them, and returns responses. Key responsibilities:</p>
+            <ul>
+                <li>Registering available tools (operations Claude can perform)</li>
+                <li>Handling tool invocation requests</li>
+                <li>Managing authentication and API communication</li>
+                <li>Error handling and validation</li>
+            </ul>
+
+            <h4>3. Git Platform API</h4>
+            <p>The target system (Gitea/GitHub) that your server communicates with via REST APIs.</p>
+
+            <h3>Communication Flow</h3>
+
+            <pre data-lang="plaintext">
+User: "Create a deployment.yaml for nginx"
+  ↓
+Claude Desktop: Understands intent, calls gitea_create_file tool
+  ↓
+MCP Server: Receives tool call, validates parameters
+  ↓
+Git API: Creates file, returns commit info
+  ↓
+MCP Server: Formats response
+  ↓
+Claude Desktop: Shows success message to user
+            </pre>
+        </section>
+
+        <section id="prerequisites" style="--index: 3">
+            <h2>Prerequisites & Setup</h2>
+
+            <h3>Required Tools</h3>
+
+            <ul>
+                <li><strong>Node.js 18+</strong>: Runtime for our TypeScript server</li>
+                <li><strong>TypeScript 5+</strong>: For type-safe development</li>
+                <li><strong>Git platform access</strong>: Gitea or GitHub with API access</li>
+                <li><strong>Claude Desktop</strong>: The MCP client</li>
+            </ul>
+
+            <h3>Initial Setup</h3>
+
+            <pre data-lang="bash">
+# Create project directory
+mkdir gitea-mcp-server
+cd gitea-mcp-server
+
+# Initialize npm project
+npm init -y
+
+# Install core dependencies
+npm install @modelcontextprotocol/sdk axios dotenv zod
+
+# Install dev dependencies
+npm install -D typescript @types/node ts-node
+
+# Initialize TypeScript
+npx tsc --init
+            </pre>
+
+            <h3>Get API Access</h3>
+
+            <p>For <strong>Gitea</strong>:</p>
+            <ol>
+                <li>Navigate to Settings → Applications</li>
+                <li>Generate New Token with <code>repository</code> permissions</li>
+                <li>Save the token securely</li>
+            </ol>
+
+            <p>For <strong>GitHub</strong>:</p>
+            <ol>
+                <li>Settings → Developer settings → Personal access tokens</li>
+                <li>Generate new token (classic) with <code>repo</code> scope</li>
+                <li>Save the token securely</li>
+            </ol>
+
+            <div class="warning-box">
+                <p><strong>Security Warning:</strong> Never commit API tokens to version control. Always use environment variables or secure secret management.</p>
+            </div>
+        </section>
+
+        <section id="project-structure" style="--index: 4">
+            <h2>Project Structure</h2>
+
+            <pre data-lang="plaintext">
+gitea-mcp-server/
+├── src/
+│   ├── index.ts              # Main server entry point
+│   ├── types.ts              # TypeScript type definitions
+│   ├── gitea-client.ts       # API client implementation
+│   ├── tools.ts              # MCP tool definitions
+│   ├── handlers.ts           # Tool request handlers
+│   └── utils.ts              # Helper functions
+├── package.json              # Dependencies
+├── tsconfig.json             # TypeScript configuration
+├── .env.example              # Environment template
+└── README.md                 # Documentation
+            </pre>
+
+            <p>This structure separates concerns cleanly:</p>
+
+            <ul>
+                <li><strong>index.ts</strong>: Server initialization and MCP protocol handling</li>
+                <li><strong>types.ts</strong>: All TypeScript interfaces and types</li>
+                <li><strong>gitea-client.ts</strong>: Encapsulates all Git platform API calls</li>
+                <li><strong>tools.ts</strong>: Declares what Claude can do (the "menu")</li>
+                <li><strong>handlers.ts</strong>: Implements the actual tool logic</li>
+                <li><strong>utils.ts</strong>: Logging, validation, helpers</li>
+            </ul>
+        </section>
+
+        <section id="implementation" style="--index: 5">
+            <h2>Core Implementation</h2>
+
+            <h3>Step 1: Define TypeScript Types</h3>
+
+            <p>Strong typing is crucial for reliability. Start with comprehensive type definitions:</p>
+
+            <pre data-lang="typescript">
+// src/types.ts
+export interface GiteaConfig {
+  url: string;
+  token: string;
+  defaultOwner: string;
+  defaultRepo: string;
+  defaultBranch: string;
+  author: {
+    name: string;
+    email: string;
+  };
+}
+
+export interface Repository {
+  id: number;
+  name: string;
+  full_name: string;
+  description: string;
+  private: boolean;
+  default_branch: string;
+  html_url: string;
+  clone_url: string;
+}
+
+export interface FileContent {
+  name: string;
+  path: string;
+  sha: string;
+  size: number;
+  content: string; // Base64 encoded
+  encoding: string;
+  html_url: string;
+}
+
+export interface CreateFileParams {
+  owner: string;
+  repo: string;
+  path: string;
+  content: string;
+  message: string;
+  branch?: string;
+  author?: {
+    name: string;
+    email: string;
+  };
+}
+
+// Error types
+export class GiteaError extends Error {
+  constructor(
+    message: string,
+    public statusCode?: number,
+    public response?: any
+  ) {
+    super(message);
+    this.name = 'GiteaError';
+  }
+}
+            </pre>
+
+            <h3>Step 2: Build the API Client</h3>
+
+            <p>Create a robust client for Git platform communication:</p>
+
+            <pre data-lang="typescript">
+// src/gitea-client.ts
+import axios, { AxiosInstance } from 'axios';
+import { GiteaConfig, CreateFileParams, FileContent } from './types.js';
+
+export class GiteaClient {
+  private client: AxiosInstance;
+  private config: GiteaConfig;
+
+  constructor(config: GiteaConfig) {
+    this.config = config;
+    this.client = axios.create({
+      baseURL: `${config.url}/api/v1`,
+      headers: {
+        Authorization: `token ${config.token}`,
+        'Content-Type': 'application/json',
+      },
+      timeout: 30000,
+    });
+  }
+
+  async getFile(params: {
+    owner: string;
+    repo: string;
+    path: string;
+    branch?: string;
+  }): Promise<FileContent> {
+    const branch = params.branch || this.config.defaultBranch;
+    
+    const response = await this.client.get(
+      `/repos/${params.owner}/${params.repo}/contents/${params.path}`,
+      { params: { ref: branch } }
+    );
+
+    // Decode base64 content
+    response.data.content = Buffer.from(
+      response.data.content,
+      'base64'
+    ).toString('utf-8');
+
+    return response.data;
+  }
+
+  async createFile(params: CreateFileParams): Promise<any> {
+    const branch = params.branch || this.config.defaultBranch;
+    const author = params.author || this.config.author;
+
+    // Encode content to base64
+    const content = Buffer.from(params.content).toString('base64');
+
+    const response = await this.client.post(
+      `/repos/${params.owner}/${params.repo}/contents/${params.path}`,
+      {
+        content,
+        message: params.message,
+        branch,
+        author: {
+          name: author.name,
+          email: author.email,
+        },
+      }
+    );
+
+    return response.data;
+  }
+
+  // Implement other methods: updateFile, deleteFile, 
+  // listRepos, createBranch, createPR, etc.
+}
+            </pre>
+
+            <div class="info-box">
+                <p><strong>Pro Tip:</strong> The Git API expects file content in base64 encoding. Always encode before sending and decode when receiving.</p>
+            </div>
+        </section>
+
+        <section id="api-integration" style="--index: 6">
+            <h2>Git Platform API Integration</h2>
+
+            <h3>Understanding Git Platform APIs</h3>
+
+            <p>Both Gitea and GitHub provide RESTful APIs, but there are subtle differences:</p>
+
+            <h4>Gitea API</h4>
+            <pre data-lang="plaintext">
+Base URL: https://your-gitea.com/api/v1
+Auth: Bearer token in Authorization header
+Endpoints:
+  - GET  /repos/{owner}/{repo}/contents/{path}
+  - POST /repos/{owner}/{repo}/contents/{path}
+  - PUT  /repos/{owner}/{repo}/contents/{path}
+  - DELETE /repos/{owner}/{repo}/contents/{path}
+            </pre>
+
+            <h4>GitHub API</h4>
+            <pre data-lang="plaintext">
+Base URL: https://api.github.com
+Auth: Bearer token in Authorization header
+Endpoints: Similar structure to Gitea
+Additional: Rate limiting (5000/hour authenticated)
+            </pre>
+
+            <h3>Key API Operations</h3>
+
+            <h4>1. Create File</h4>
+            <pre data-lang="typescript">
+async createFile(params: CreateFileParams) {
+  // File must not exist
+  const content = Buffer.from(params.content).toString('base64');
+  
+  return await this.client.post(
+    `/repos/${params.owner}/${params.repo}/contents/${params.path}`,
+    {
+      content,
+      message: params.message,
+      branch: params.branch || 'main',
+    }
+  );
+}
+            </pre>
+
+            <h4>2. Update File</h4>
+            <pre data-lang="typescript">
+async updateFile(params: UpdateFileParams) {
+  // Must provide current file SHA
+  // Get current file first to retrieve SHA
+  const currentFile = await this.getFile({
+    owner: params.owner,
+    repo: params.repo,
+    path: params.path,
+  });
+  
+  const content = Buffer.from(params.content).toString('base64');
+  
+  return await this.client.put(
+    `/repos/${params.owner}/${params.repo}/contents/${params.path}`,
+    {
+      content,
+      message: params.message,
+      sha: currentFile.sha, // Required!
+      branch: params.branch || 'main',
+    }
+  );
+}
+            </pre>
+
+            <div class="warning-box">
+                <p><strong>Critical:</strong> File updates require the current SHA. This prevents conflicts from concurrent modifications. Always fetch the file first to get the latest SHA.</p>
+            </div>
+
+            <h4>3. Create Branch</h4>
+            <pre data-lang="typescript">
+async createBranch(params: {
+  owner: string;
+  repo: string;
+  branch: string;
+  from?: string;
+}) {
+  // Get source branch commit SHA
+  const branches = await this.listBranches({
+    owner: params.owner,
+    repo: params.repo,
+  });
+  
+  const sourceBranch = branches.find(
+    b => b.name === (params.from || 'main')
+  );
+  
+  if (!sourceBranch) {
+    throw new Error(`Source branch not found: ${params.from}`);
+  }
+  
+  return await this.client.post(
+    `/repos/${params.owner}/${params.repo}/branches`,
+    {
+      new_branch_name: params.branch,
+      old_ref_name: params.from || 'main',
+    }
+  );
+}
+            </pre>
+
+            <h4>4. Create Pull Request</h4>
+            <pre data-lang="typescript">
+async createPullRequest(params: {
+  owner: string;
+  repo: string;
+  title: string;
+  head: string;  // Source branch
+  base: string;  // Target branch
+  body?: string;
+}) {
+  return await this.client.post(
+    `/repos/${params.owner}/${params.repo}/pulls`,
+    {
+      title: params.title,
+      head: params.head,
+      base: params.base,
+      body: params.body || '',
+    }
+  );
+}
+            </pre>
+        </section>
+
+        <section id="tools" style="--index: 7">
+            <h2>Defining MCP Tools</h2>
+
+            <p>Tools are the core of MCP - they define what operations Claude can perform. Each tool needs:</p>
+
+            <ul>
+                <li><strong>Name</strong>: Unique identifier (e.g., <code>gitea_create_file</code>)</li>
+                <li><strong>Description</strong>: What the tool does (Claude uses this to decide when to call it)</li>
+                <li><strong>Input schema</strong>: JSON Schema defining required and optional parameters</li>
+            </ul>
+
+            <h3>Tool Definition Structure</h3>
+
+            <pre data-lang="typescript">
+// src/tools.ts
+export const tools = [
+  {
+    name: 'gitea_create_file',
+    description: 'Create a new file in repository and commit it',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        owner: {
+          type: 'string',
+          description: 'Repository owner (username or org)',
+        },
+        repo: {
+          type: 'string',
+          description: 'Repository name',
+        },
+        path: {
+          type: 'string',
+          description: 'File path (e.g., apps/nginx/deployment.yaml)',
+        },
+        content: {
+          type: 'string',
+          description: 'File content',
+        },
+        message: {
+          type: 'string',
+          description: 'Commit message (use conventional commits)',
+        },
+        branch: {
+          type: 'string',
+          description: 'Branch name (defaults to main)',
+        },
+      },
+      required: ['owner', 'repo', 'path', 'content', 'message'],
+    },
+  },
+  
+  {
+    name: 'gitea_update_file',
+    description: 'Update an existing file in repository',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        owner: { type: 'string', description: 'Repository owner' },
+        repo: { type: 'string', description: 'Repository name' },
+        path: { type: 'string', description: 'File path' },
+        content: { type: 'string', description: 'New content' },
+        message: { type: 'string', description: 'Commit message' },
+        branch: { type: 'string', description: 'Branch (optional)' },
+      },
+      required: ['owner', 'repo', 'path', 'content', 'message'],
+    },
+  },
+  
+  {
+    name: 'gitea_get_file',
+    description: 'Read file content from repository',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        owner: { type: 'string' },
+        repo: { type: 'string' },
+        path: { type: 'string' },
+        branch: { type: 'string' },
+      },
+      required: ['owner', 'repo', 'path'],
+    },
+  },
+  
+  {
+    name: 'gitea_create_branch',
+    description: 'Create a new branch',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        owner: { type: 'string' },
+        repo: { type: 'string' },
+        branch: { type: 'string', description: 'New branch name' },
+        from: { type: 'string', description: 'Source branch (default: main)' },
+      },
+      required: ['owner', 'repo', 'branch'],
+    },
+  },
+  
+  {
+    name: 'gitea_create_pr',
+    description: 'Create a pull request',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        owner: { type: 'string' },
+        repo: { type: 'string' },
+        title: { type: 'string', description: 'PR title' },
+        head: { type: 'string', description: 'Source branch' },
+        base: { type: 'string', description: 'Target branch' },
+        body: { type: 'string', description: 'PR description' },
+      },
+      required: ['owner', 'repo', 'title', 'head', 'base'],
+    },
+  },
+];
+            </pre>
+
+            <div class="success-box">
+                <p><strong>Best Practice:</strong> Make tool descriptions clear and specific. Claude uses these to determine when to call each tool. Good descriptions lead to better tool selection.</p>
+            </div>
+        </section>
+
+        <section id="handlers" style="--index: 8">
+            <h2>Request Handlers</h2>
+
+            <p>Handlers implement the actual logic for each tool. They receive parameters from Claude, execute operations, and return formatted responses.</p>
+
+            <h3>Handler Pattern</h3>
+
+            <pre data-lang="typescript">
+// src/handlers.ts
+import { GiteaClient } from './gitea-client.js';
+
+export class ToolHandlers {
+  constructor(
+    private client: GiteaClient,
+    private config: any
+  ) {}
+
+  async handleCreateFile(args: any) {
+    // 1. Validate and prepare parameters
+    const owner = args.owner || this.config.defaultOwner;
+    const repo = args.repo || this.config.defaultRepo;
+    
+    // 2. Call API client
+    const result = await this.client.createFile({
+      owner,
+      repo,
+      path: args.path,
+      content: args.content,
+      message: args.message,
+      branch: args.branch,
+    });
+    
+    // 3. Format response for Claude
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `✅ File created successfully!
+
+Path: ${result.content.path}
+Commit: ${result.commit.message}
+SHA: ${result.commit.sha}
+URL: ${result.content.html_url}
+
+The file has been committed and pushed to the repository.`,
+        },
+      ],
+    };
+  }
+
+  async handleUpdateFile(args: any) {
+    const owner = args.owner || this.config.defaultOwner;
+    const repo = args.repo || this.config.defaultRepo;
+    
+    // Get current file for SHA
+    const currentFile = await this.client.getFile({
+      owner,
+      repo,
+      path: args.path,
+      branch: args.branch,
+    });
+    
+    // Update with current SHA
+    const result = await this.client.updateFile({
+      owner,
+      repo,
+      path: args.path,
+      content: args.content,
+      message: args.message,
+      sha: currentFile.sha,
+      branch: args.branch,
+    });
+    
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `✅ File updated successfully!
+
+Path: ${result.content.path}
+Commit: ${result.commit.message}
+SHA: ${result.commit.sha}
+
+The changes have been committed and pushed.`,
+        },
+      ],
+    };
+  }
+
+  async handleGetFile(args: any) {
+    const file = await this.client.getFile({
+      owner: args.owner || this.config.defaultOwner,
+      repo: args.repo || this.config.defaultRepo,
+      path: args.path,
+      branch: args.branch,
+    });
+    
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify({
+            path: file.path,
+            content: file.content,
+            sha: file.sha,
+            size: file.size,
+          }, null, 2),
+        },
+      ],
+    };
+  }
+}
+            </pre>
+
+            <h3>Main Server Implementation</h3>
+
+            <pre data-lang="typescript">
+// src/index.ts
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import {
+  CallToolRequestSchema,
+  ListToolsRequestSchema,
+} from '@modelcontextprotocol/sdk/types.js';
+import dotenv from 'dotenv';
+import { GiteaClient } from './gitea-client.js';
+import { tools } from './tools.js';
+import { ToolHandlers } from './handlers.js';
+
+dotenv.config();
+
+// Configuration
+const config = {
+  url: process.env.GITEA_URL!,
+  token: process.env.GITEA_TOKEN!,
+  defaultOwner: process.env.GITEA_DEFAULT_OWNER || 'admin',
+  defaultRepo: process.env.GITEA_DEFAULT_REPO || 'k3s-gitops',
+  defaultBranch: process.env.GITEA_DEFAULT_BRANCH || 'main',
+  author: {
+    name: process.env.GIT_AUTHOR_NAME || 'Claude AI',
+    email: process.env.GIT_AUTHOR_EMAIL || 'claude@ai.com',
+  },
+};
+
+// Initialize
+const giteaClient = new GiteaClient(config);
+const handlers = new ToolHandlers(giteaClient, config);
+
+// Create MCP server
+const server = new Server(
+  {
+    name: 'gitea',
+    version: '1.0.0',
+  },
+  {
+    capabilities: {
+      tools: {},
+    },
+  }
+);
+
+// Register handlers
+server.setRequestHandler(ListToolsRequestSchema, async () => {
+  return { tools };
+});
+
+server.setRequestHandler(CallToolRequestSchema, async (request) => {
+  const { name, arguments: args } = request.params;
+  
+  try {
+    switch (name) {
+      case 'gitea_create_file':
+        return await handlers.handleCreateFile(args || {});
+      case 'gitea_update_file':
+        return await handlers.handleUpdateFile(args || {});
+      case 'gitea_get_file':
+        return await handlers.handleGetFile(args || {});
+      // ... other handlers
+      default:
+        throw new Error(`Unknown tool: ${name}`);
+    }
+  } catch (error) {
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `❌ Error: ${error.message}`,
+        },
+      ],
+      isError: true,
+    };
+  }
+});
+
+// Start server
+async function main() {
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
+  console.error('Gitea MCP Server running');
+}
+
+main();
+            </pre>
+        </section>
+
+        <section id="error-handling" style="--index: 9">
+            <h2>Error Handling & Security</h2>
+
+            <h3>Comprehensive Error Handling</h3>
+
+            <p>Production servers need robust error handling at multiple levels:</p>
+
+            <pre data-lang="typescript">
+// Custom error classes
+export class GiteaError extends Error {
+  constructor(
+    message: string,
+    public statusCode?: number,
+    public response?: any
+  ) {
+    super(message);
+    this.name = 'GiteaError';
+  }
+}
+
+export class NotFoundError extends GiteaError {
+  constructor(resource: string) {
+    super(`Resource not found: ${resource}`, 404);
+  }
+}
+
+export class ConflictError extends GiteaError {
+  constructor(message: string) {
+    super(message, 409);
+  }
+}
+
+export class AuthenticationError extends GiteaError {
+  constructor() {
+    super('Authentication failed. Check your token.', 401);
+  }
+}
+
+// In API client
+private handleError(error: AxiosError): never {
+  if (error.response) {
+    const status = error.response.status;
+    const data = error.response.data as any;
+    
+    if (status === 404) {
+      throw new NotFoundError(data?.message || 'Resource');
+    }
+    if (status === 401 || status === 403) {
+      throw new AuthenticationError();
+    }
+    if (status === 409) {
+      throw new ConflictError(
+        data?.message || 'Resource conflict'
+      );
+    }
+    
+    throw new GiteaError(
+      data?.message || 'API request failed',
+      status,
+      data
+    );
+  }
+  
+  throw new GiteaError(`Cannot reach server: ${error.message}`);
+}
+            </pre>
+
+            <h3>Input Validation</h3>
+
+            <pre data-lang="typescript">
+import { z } from 'zod';
+
+// Define schemas
+const CreateFileSchema = z.object({
+  owner: z.string().min(1),
+  repo: z.string().min(1),
+  path: z.string().min(1).regex(/^[^/].*$/), // No leading slash
+  content: z.string(),
+  message: z.string().min(1),
+  branch: z.string().optional(),
+});
+
+// Validate in handlers
+async handleCreateFile(args: any) {
+  // Validate input
+  const params = CreateFileSchema.parse(args);
+  
+  // Sanitize path
+  params.path = params.path.replace(/\.\.\//g, '');
+  
+  // Proceed with operation
+  const result = await this.client.createFile(params);
+  // ...
+}
+            </pre>
+
+            <h3>Security Best Practices</h3>
+
+            <div class="warning-box">
+                <h4>Critical Security Considerations</h4>
+                <ul>
+                    <li><strong>Token Storage</strong>: Never hardcode tokens. Use environment variables.</li>
+                    <li><strong>Path Traversal</strong>: Sanitize file paths to prevent <code>../</code> attacks.</li>
+                    <li><strong>Minimal Permissions</strong>: Request only necessary API scopes.</li>
+                    <li><strong>Rate Limiting</strong>: Implement backoff for API rate limits.</li>
+                    <li><strong>Logging</strong>: Log errors but never log sensitive data (tokens, passwords).</li>
+                </ul>
+            </div>
+
+            <pre data-lang="typescript">
+// Secure configuration loading
+function loadConfig(): GiteaConfig {
+  const required = ['GITEA_URL', 'GITEA_TOKEN'];
+  const missing = required.filter(key => !process.env[key]);
+  
+  if (missing.length > 0) {
+    throw new Error(
+      `Missing required env vars: ${missing.join(', ')}`
+    );
+  }
+  
+  return {
+    url: process.env.GITEA_URL!,
+    token: process.env.GITEA_TOKEN!,
+    // Never log the token
+    // ...
+  };
+}
+
+// Path sanitization
+function sanitizePath(path: string): string {
+  // Remove leading/trailing slashes
+  let clean = path.replace(/^\/+|\/+$/g, '');
+  
+  // Remove double slashes
+  clean = clean.replace(/\/+/g, '/');
+  
+  // Remove ../ for security
+  clean = clean.replace(/\.\.\//g, '');
+  
+  return clean;
+}
+            </pre>
+        </section>
+
+        <section id="testing" style="--index: 10">
+            <h2>Testing & Deployment</h2>
+
+            <h3>Manual Testing</h3>
+
+            <pre data-lang="bash">
+# Build the project
+npm run build
+
+# Test server manually
+npm start
+
+# Server should start and log:
+# "Gitea MCP Server running"
+
+# Test with curl (if testing connection)
+curl -H "Authorization: token YOUR_TOKEN" \
+  https://your-gitea.com/api/v1/user
+            </pre>
+
+            <h3>Integration Testing</h3>
+
+            <pre data-lang="typescript">
+// test/integration.test.ts
+import { GiteaClient } from '../src/gitea-client';
+
+describe('GiteaClient', () => {
+  let client: GiteaClient;
+  
+  beforeAll(() => {
+    client = new GiteaClient({
+      url: process.env.TEST_GITEA_URL!,
+      token: process.env.TEST_GITEA_TOKEN!,
+      // ...
+    });
+  });
+  
+  it('should create a file', async () => {
+    const result = await client.createFile({
+      owner: 'test',
+      repo: 'test-repo',
+      path: 'test.txt',
+      content: 'Hello World',
+      message: 'test: Add test file',
+    });
+    
+    expect(result.content.path).toBe('test.txt');
+    expect(result.commit.message).toBe('test: Add test file');
+  });
+  
+  it('should handle file not found', async () => {
+    await expect(
+      client.getFile({
+        owner: 'test',
+        repo: 'test-repo',
+        path: 'nonexistent.txt',
+      })
+    ).rejects.toThrow(NotFoundError);
+  });
+});
+            </pre>
+
+            <h3>Build for Production</h3>
+
+            <pre data-lang="json">
+// package.json
+{
+  "scripts": {
+    "build": "tsc",
+    "start": "node build/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts"
+  }
+}
+            </pre>
+
+            <h3>Deployment Options</h3>
+
+            <h4>1. Local Deployment (Windows/Mac)</h4>
+            <p>For Claude Desktop, the server runs locally on the user's machine.</p>
+
+            <pre data-lang="bash">
+# Build once
+npm run build
+
+# Server is started automatically by Claude Desktop
+# via configuration in claude_desktop_config.json
+            </pre>
+
+            <h4>2. Remote Deployment</h4>
+            <p>For team usage, deploy to a server:</p>
+
+            <pre data-lang="bash">
+# Using PM2 for process management
+npm install -g pm2
+pm2 start build/index.js --name gitea-mcp
+pm2 save
+pm2 startup
+            </pre>
+
+            <h4>3. Docker Deployment</h4>
+            <pre data-lang="dockerfile">
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --only=production
+
+COPY build ./build
+COPY .env ./.env
+
+CMD ["node", "build/index.js"]
+            </pre>
+        </section>
+
+        <section id="claude-integration" style="--index: 11">
+            <h2>Claude Desktop Integration</h2>
+
+            <h3>Configuration File Location</h3>
+
+            <p>Claude Desktop discovers MCP servers through a configuration file:</p>
+
+            <ul>
+                <li><strong>Windows</strong>: <code>%APPDATA%\Claude\claude_desktop_config.json</code></li>
+                <li><strong>macOS</strong>: <code>~/Library/Application Support/Claude/claude_desktop_config.json</code></li>
+            </ul>
+
+            <h3>Configuration Format</h3>
+
+            <pre data-lang="json">
+{
+  "mcpServers": {
+    "gitea": {
+      "command": "node",
+      "args": [
+        "C:\\path\\to\\gitea-mcp-server\\build\\index.js"
+      ],
+      "env": {
+        "GITEA_URL": "https://git.thedevops.dev",
+        "GITEA_TOKEN": "your-access-token",
+        "GITEA_DEFAULT_OWNER": "admin",
+        "GITEA_DEFAULT_REPO": "k3s-gitops",
+        "GITEA_DEFAULT_BRANCH": "main",
+        "GIT_AUTHOR_NAME": "Claude AI",
+        "GIT_AUTHOR_EMAIL": "claude@ai.com"
+      }
+    }
+  }
+}
+            </pre>
+
+            <div class="info-box">
+                <h4>Configuration Notes</h4>
+                <ul>
+                    <li>Use absolute paths for the server file</li>
+                    <li>On Windows, use double backslashes <code>\\</code> or forward slashes <code>/</code></li>
+                    <li>Environment variables are passed directly to the server process</li>
+                    <li>Never commit this file with your token to version control</li>
+                </ul>
+            </div>
+
+            <h3>Multiple MCP Servers</h3>
+
+            <p>You can configure multiple servers simultaneously:</p>
+
+            <pre data-lang="json">
+{
+  "mcpServers": {
+    "gitea": {
+      "command": "node",
+      "args": ["C:\\path\\to\\gitea-mcp-server\\build\\index.js"],
+      "env": { /* Gitea config */ }
+    },
+    "github": {
+      "command": "node",
+      "args": ["C:\\path\\to\\github-mcp-server\\build\\index.js"],
+      "env": { /* GitHub config */ }
+    },
+    "kubernetes": {
+      "command": "npx",
+      "args": ["-y", "mcp-server-kubernetes"],
+      "env": { "KUBECONFIG": "C:\\Users\\you\\.kube\\config" }
+    }
+  }
+}
+            </pre>
+
+            <h3>Restarting After Changes</h3>
+
+            <p>After modifying the configuration or rebuilding the server:</p>
+
+            <ol>
+                <li>Completely quit Claude Desktop (not just close the window)</li>
+                <li>Wait 2-3 seconds</li>
+                <li>Restart Claude Desktop</li>
+                <li>Wait for servers to initialize (~10 seconds)</li>
+            </ol>
+
+            <h3>Troubleshooting Claude Integration</h3>
+
+            <h4>Server Not Loading</h4>
+            <pre data-lang="bash">
+# Check logs (Windows)
+type %APPDATA%\Claude\logs\mcp.log
+
+# Check server starts manually
+cd path\to\gitea-mcp-server
+npm start
+# Should see: "Gitea MCP Server running"
+            </pre>
+
+            <h4>Tools Not Appearing</h4>
+            <ul>
+                <li>Verify JSON syntax in config file (use JSONLint)</li>
+                <li>Check file paths are absolute and correct</li>
+                <li>Ensure <code>build/</code> directory exists with compiled JavaScript</li>
+                <li>Restart Claude Desktop completely</li>
+            </ul>
+
+            <h4>Authentication Errors</h4>
+            <ul>
+                <li>Verify <code>GITEA_TOKEN</code> in config is correct</li>
+                <li>Check token has <code>repository</code> permissions</li>
+                <li>Test token manually with curl</li>
+            </ul>
+        </section>
+
+        <section id="real-world" style="--index: 12">
+            <h2>Real-World Usage Examples</h2>
+
+            <h3>Example 1: Creating Kubernetes Manifests</h3>
+
+            <pre data-lang="plaintext">
+User: "Create a deployment for nginx with 3 replicas in k3s-gitops"
+
+Claude: I'll create an nginx deployment with 3 replicas.
+        [calls gitea_create_file]
+        
+        ✅ Created apps/nginx/deployment.yaml
+        📝 Commit: "feat(nginx): Add deployment with 3 replicas"
+        🔗 https://git.thedevops.dev/admin/k3s-gitops/...
+        
+        The deployment is now in your repository. 
+        ArgoCD will automatically deploy it to your cluster!
+            </pre>
+
+            <p>Claude automatically:</p>
+            <ul>
+                <li>Generated proper YAML structure</li>
+                <li>Used conventional commit format</li>
+                <li>Placed file in correct directory</li>
+                <li>Committed and pushed to Git</li>
+            </ul>
+
+            <h3>Example 2: Feature Branch Workflow</h3>
+
+            <pre data-lang="plaintext">
+User: "Create a feature branch for prometheus monitoring 
+       and add all necessary manifests"
+
+Claude: I'll create a feature branch and add Prometheus.
+        [calls gitea_create_branch: feature/add-prometheus]
+        [calls gitea_create_file x4 with branch: feature/add-prometheus]
+        
+        ✅ Created branch: feature/add-prometheus
+        ✅ Added 4 manifests:
+           - apps/prometheus/deployment.yaml
+           - apps/prometheus/service.yaml
+           - apps/prometheus/configmap.yaml
+           - apps/prometheus/servicemonitor.yaml
+        
+        📝 All files committed with: 
+           "feat(prometheus): Add complete monitoring stack"
+
+User: "Now create a PR to main"
+
+Claude: [calls gitea_create_pr]
+        
+        ✅ Pull Request #15 created!
+        Title: "feat: Add Prometheus monitoring stack"
+        From: feature/add-prometheus → main
+        
+        Review at: https://git.thedevops.dev/admin/k3s-gitops/pulls/15
+            </pre>
+
+            <h3>Example 3: Bulk Updates</h3>
+
+            <pre data-lang="plaintext">
+User: "Update all ingress files to use cert-manager 
+       for TLS certificates"
+
+Claude: I'll update the ingress files.
+        [calls gitea_get_tree for apps/]
+        [finds 8 ingress.yaml files]
+        
+        For each ingress:
+        [calls gitea_get_file]
+        [modifies to add cert-manager annotation]
+        [calls gitea_update_file]
+        
+        ✅ Updated 8 ingress files:
+           - apps/grafana/ingress.yaml
+           - apps/argocd/ingress.yaml
+           - apps/jenkins/ingress.yaml
+           - apps/prometheus/ingress.yaml
+           - apps/loki/ingress.yaml
+           - apps/vault/ingress.yaml
+           - apps/harbor/ingress.yaml
+           - apps/minio/ingress.yaml
+        
+        📝 Commit: "chore: Add cert-manager TLS to all ingresses"
+        
+        All changes are committed and ArgoCD will sync them!
+            </pre>
+
+            <h3>Example 4: Configuration Updates</h3>
+
+            <pre data-lang="plaintext">
+User: "Scale loki StatefulSet to 5 replicas and 
+       increase storage to 20Gi"
+
+Claude: [calls gitea_get_file: apps/loki/statefulset.yaml]
+        [modifies replicas: 5 and storage: 20Gi]
+        [calls gitea_update_file]
+        
+        ✅ Updated apps/loki/statefulset.yaml
+        
+        Changes:
+        • Replicas: 3 → 5
+        • Storage: 10Gi → 20Gi
+        
+        📝 Commit: "chore(loki): Scale to 5 replicas and increase storage"
+        
+        ArgoCD will apply these changes to your cluster.
+            </pre>
+
+            <h3>Example 5: Documentation Generation</h3>
+
+            <pre data-lang="plaintext">
+User: "Create a README for the monitoring namespace 
+       explaining the architecture"
+
+Claude: [generates comprehensive README]
+        [calls gitea_create_file: apps/monitoring/README.md]
+        
+        ✅ Created apps/monitoring/README.md
+        
+        Includes:
+        • Architecture overview
+        • Component descriptions
+        • Configuration guide
+        • Troubleshooting tips
+        • Useful commands
+        
+        📝 Commit: "docs(monitoring): Add comprehensive README"
+            </pre>
+
+            <h3>Benefits in Production</h3>
+
+            <div class="success-box">
+                <h4>Real Impact</h4>
+                <ul>
+                    <li><strong>Speed</strong>: Infrastructure changes in seconds vs minutes</li>
+                    <li><strong>Accuracy</strong>: Claude generates syntactically correct YAML</li>
+                    <li><strong>GitOps</strong>: Everything goes through Git, maintaining audit trail</li>
+                    <li><strong>Consistency</strong>: Conventional commits, proper structure</li>
+                    <li><strong>Automation</strong>: ArgoCD deploys changes automatically</li>
+                    <li><strong>Documentation</strong>: Claude can document as it builds</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="conclusion" style="--index: 13">
+            <h2>Conclusion</h2>
+
+            <p>Building an MCP server transforms Claude from a conversational assistant into an active participant in your development workflow. The architecture we've explored enables:</p>
+
+            <ul>
+                <li><strong>Natural Language GitOps</strong>: Manage infrastructure with conversational commands</li>
+                <li><strong>Automated Workflows</strong>: Complex multi-step operations handled seamlessly</li>
+                <li><strong>Production-Ready</strong>: Type-safe, error-handled, secure implementation</li>
+                <li><strong>Extensible</strong>: Easy to add new tools and capabilities</li>
+            </ul>
+
+            <h3>Next Steps</h3>
+
+            <ol>
+                <li><strong>Extend Functionality</strong>: Add support for issues, releases, webhooks</li>
+                <li><strong>Multi-Platform</strong>: Support both Gitea and GitHub simultaneously</li>
+                <li><strong>Advanced Features</strong>: Implement caching, batch operations, conflict resolution</li>
+                <li><strong>Team Deployment</strong>: Deploy server centrally for team access</li>
+                <li><strong>Custom Workflows</strong>: Build specialized tools for your specific needs</li>
+            </ol>
+
+            <h3>Key Takeaways</h3>
+
+            <div class="info-box">
+                <ul>
+                    <li>MCP servers bridge AI and real-world systems</li>
+                    <li>TypeScript provides type safety and excellent DX</li>
+                    <li>Proper error handling is crucial for production use</li>
+                    <li>Security considerations must be built-in from the start</li>
+                    <li>The possibilities for automation are virtually limitless</li>
+                </ul>
+            </div>
+
+            <p>The full source code for this MCP server is production-ready and includes comprehensive error handling, logging, and security features. You can extend it to support additional Git platforms, add more sophisticated workflows, or integrate with other systems in your infrastructure.</p>
+
+            <p class="subtitle" style="margin-top: 60px;">Happy building! 🚀</p>
+        </section>
+
+        <footer>
+            <div class="author">
+                <div class="author-avatar">VL</div>
+                <div>
+                    <strong>Vladimiras Levinas</strong><br>
+                    Lead DevOps Engineer
+                </div>
+            </div>
+            <p>© 2026 · Built with production experience from real-world GitOps automation</p>
+        </footer>
+    </div>
+
+    <script>
+        // Add scroll-triggered animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+
+        document.querySelectorAll('section').forEach((section) => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(30px)';
+            section.style.transition = 'all 0.6s ease-out';
+            observer.observe(section);
+        });
+
+        // Smooth scrolling for TOC links
+        document.querySelectorAll('.toc a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
