@@ -99,10 +99,11 @@
 - [186. xbps](notes/xbps.md)
 - [187. xdp-filter](notes/xdp-filter.md)
 - [188. xed](notes/xed.md)
-- [189. xhost](notes/xhost.md)
+- [189. xfreerdp](notes/xfreerdp.md)
 - [19. bitwise](notes/bitwise.md)
-- [190. xwinwrap](notes/xwinwrap.md)
-- [191. ydotool](notes/ydotool.md)
+- [190. xhost](notes/xhost.md)
+- [191. xwinwrap](notes/xwinwrap.md)
+- [192. ydotool](notes/ydotool.md)
 - [2. aa-cleanprof](notes/aa-cleanprof.md)
 - [20. blastp](notes/blastp.md)
 - [21. blurlock](notes/blurlock.md)
@@ -192,4 +193,4 @@
 - [98. mate-screenshot](notes/mate-screenshot.md)
 - [99. mcookie](notes/mcookie.md)
 
-_Last updated: 2026-01-10 19:19:10 UTC_
+_Last updated: 2026-01-11 07:25:15 UTC_
