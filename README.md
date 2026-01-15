@@ -119,6 +119,7 @@
 - [203. xhost](notes/xhost.md)
 - [204. xwinwrap](notes/xwinwrap.md)
 - [205. ydotool](notes/ydotool.md)
+- [206. yplan](notes/yplan.md)
 - [21. blastp](notes/blastp.md)
 - [22. blurlock](notes/blurlock.md)
 - [23. bmon](notes/bmon.md)
@@ -206,4 +207,4 @@
 - [98. logrotate](notes/logrotate.md)
 - [99. logwatch](notes/logwatch.md)
 
-_Last updated: 2026-01-15 13:43:47 UTC_
+_Last updated: 2026-01-15 19:28:41 UTC_
