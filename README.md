@@ -128,8 +128,9 @@
 - [211. xfreerdp](notes/xfreerdp.md)
 - [212. xhost](notes/xhost.md)
 - [213. xwinwrap](notes/xwinwrap.md)
-- [214. ydotool](notes/ydotool.md)
-- [215. yplan](notes/yplan.md)
+- [214. xxhsum](notes/xxhsum.md)
+- [215. ydotool](notes/ydotool.md)
+- [216. yplan](notes/yplan.md)
 - [22. blurlock](notes/blurlock.md)
 - [23. bmon](notes/bmon.md)
 - [24. bootctl](notes/bootctl.md)
@@ -216,4 +217,4 @@
 - [98. logrotate](notes/logrotate.md)
 - [99. logwatch](notes/logwatch.md)
 
-_Last updated: 2026-01-18 19:19:42 UTC_
+_Last updated: 2026-01-19 07:33:01 UTC_

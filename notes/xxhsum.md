@@ -1,0 +1,19 @@
+# xxhsum
+
+> Source: TLDR (MIT) — from 'vendor/tldr/'
+
+# xxhsum
+
+> Print or verify checksums using fast non-cryptographic algorithm xxHash.
+> More information: <https://manned.org/xxhsum>.
+
+- Calculate the checksum for a file using a specific algorithm:
+
+`xxhsum -H{{0|32|64|128}} {{path/to/file}}`
+
+- Run benchmark:
+
+`xxhsum -b`
+
+---
+_Imported: 2026-01-19 07:33:00 UTC_
