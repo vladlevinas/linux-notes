@@ -205,6 +205,7 @@
 - [281. xxhsum](notes/xxhsum.md)
 - [282. ydotool](notes/ydotool.md)
 - [283. yplan](notes/yplan.md)
+- [284. zenity](notes/zenity.md)
 - [29. blastn](notes/blastn.md)
 - [3. aa-cleanprof](notes/aa-cleanprof.md)
 - [30. blastp](notes/blastp.md)
@@ -284,4 +285,4 @@
 - [98. gpasswd](notes/gpasswd.md)
 - [99. groupdel](notes/groupdel.md)
 
-_Last updated: 2026-02-10 20:01:08 UTC_
+_Last updated: 2026-02-11 07:57:04 UTC_
