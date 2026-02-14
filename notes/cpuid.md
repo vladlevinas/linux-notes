@@ -1,0 +1,23 @@
+# cpuid
+
+> Source: TLDR (MIT) — from 'vendor/tldr/'
+
+# cpuid
+
+> Display detailed information about all CPUs.
+> More information: <https://manned.org/cpuid.1>.
+
+- Display information for all CPUs:
+
+`cpuid`
+
+- Display information only for the current CPU:
+
+`cpuid {{[-1|--one-cpu]}}`
+
+- Display raw hex information with no decoding:
+
+`cpuid {{[-r|--raw]}}`
+
+---
+_Imported: 2026-02-14 19:28:38 UTC_
