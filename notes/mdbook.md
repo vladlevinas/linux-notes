@@ -1,0 +1,31 @@
+# mdbook
+
+> Source: TLDR (MIT) — from 'vendor/tldr/'
+
+# mdbook
+
+> Create online books by writing Markdown files.
+> More information: <https://rust-lang.github.io/mdBook/cli/index.html>.
+
+- Create an mdbook project in the current directory:
+
+`mdbook init`
+
+- Create an mdbook project in a specific directory:
+
+`mdbook init {{path/to/directory}}`
+
+- Clean the directory with the generated book:
+
+`mdbook clean`
+
+- Serve a book at <http://localhost:3000>, auto build when file changes:
+
+`mdbook serve`
+
+- Watch a set of Markdown files and automatically build when a file is changed:
+
+`mdbook watch`
+
+---
+_Imported: 2026-02-24 14:12:45 UTC_
