@@ -269,7 +269,8 @@
 - [339. ydotool](notes/ydotool.md)
 - [34. blastn](notes/blastn.md)
 - [340. yplan](notes/yplan.md)
-- [341. zenity](notes/zenity.md)
+- [341. yum-config-manager](notes/yum-config-manager.md)
+- [342. zenity](notes/zenity.md)
 - [35. blastp](notes/blastp.md)
 - [36. blight](notes/blight.md)
 - [37. blurlock](notes/blurlock.md)
@@ -342,4 +343,4 @@
 - [98. flatpak-builder](notes/flatpak-builder.md)
 - [99. flatpak-update](notes/flatpak-update.md)
 
-_Last updated: 2026-03-02 07:51:02 UTC_
+_Last updated: 2026-03-02 14:02:11 UTC_
