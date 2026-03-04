@@ -1,0 +1,23 @@
+# sreport
+
+> Source: TLDR (MIT) — from 'vendor/tldr/'
+
+# sreport
+
+> Generate reports on jobs, users, and clusters from accounting data.
+> More information: <https://slurm.schedmd.com/sreport.html>.
+
+- Show pipe delimited cluster utilization data:
+
+`sreport {{[-p|--parsable]}} cluster utilization`
+
+- Show number of jobs run:
+
+`sreport job sizes printjobcount`
+
+- Show users with the highest CPU time use:
+
+`sreport user topuser`
+
+---
+_Imported: 2026-03-04 07:40:21 UTC_
