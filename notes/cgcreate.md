@@ -1,0 +1,24 @@
+# cgcreate
+
+> Source: TLDR (MIT) — from 'vendor/tldr/'
+
+# cgcreate
+
+> Create cgroups, used to limit, measure, and control resources used by processes.
+> `cgroups` types can be `memory`, `cpu`, `net_cls`, etc.
+> More information: <https://manned.org/cgcreate>.
+
+- Create a new [g]roup:
+
+`cgcreate -g {{group_type}}:{{group_name}}`
+
+- Create a new [g]roup with multiple cgroup types:
+
+`cgcreate -g {{group_type1}},{{group_type2}}:{{group_name}}`
+
+- Create a subgroup:
+
+`mkdir /sys/fs/cgroup/{{group_type}}/{{group_name}}/{{subgroup_name}}`
+
+---
+_Imported: 2026-03-06 07:40:51 UTC_
