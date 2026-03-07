@@ -280,12 +280,13 @@
 - [349. xfreerdp](notes/xfreerdp.md)
 - [35. bitwise](notes/bitwise.md)
 - [350. xhost](notes/xhost.md)
-- [351. xwinwrap](notes/xwinwrap.md)
-- [352. xxhsum](notes/xxhsum.md)
-- [353. ydotool](notes/ydotool.md)
-- [354. yplan](notes/yplan.md)
-- [355. yum-config-manager](notes/yum-config-manager.md)
-- [356. zenity](notes/zenity.md)
+- [351. xmodmap](notes/xmodmap.md)
+- [352. xwinwrap](notes/xwinwrap.md)
+- [353. xxhsum](notes/xxhsum.md)
+- [354. ydotool](notes/ydotool.md)
+- [355. yplan](notes/yplan.md)
+- [356. yum-config-manager](notes/yum-config-manager.md)
+- [357. zenity](notes/zenity.md)
 - [36. blastn](notes/blastn.md)
 - [37. blastp](notes/blastp.md)
 - [38. blight](notes/blight.md)
@@ -357,4 +358,4 @@
 - [98. f5fpc](notes/f5fpc.md)
 - [99. fancontrol](notes/fancontrol.md)
 
-_Last updated: 2026-03-07 07:32:44 UTC_
+_Last updated: 2026-03-07 13:41:05 UTC_
