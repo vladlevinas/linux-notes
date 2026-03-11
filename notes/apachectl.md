@@ -1,0 +1,43 @@
+# apachectl
+
+> Source: TLDR (MIT) — from 'vendor/tldr/'
+
+# apachectl
+
+> Control an Apache HTTP server.
+> More information: <https://manned.org/apachectl>.
+
+- Start the server:
+
+`sudo apachectl start`
+
+- Restart the server:
+
+`sudo apachectl restart`
+
+- Stop the server:
+
+`sudo apachectl stop`
+
+- Test configuration file validity:
+
+`apachectl configtest`
+
+- Check server status (requires the lynx browser):
+
+`apachectl status`
+
+- Reload configuration without dropping connections:
+
+`sudo apachectl graceful`
+
+- Print full Apache configuration (not always supported):
+
+`apachectl -S`
+
+- Display help:
+
+`apachectl -h`
+
+---
+_Imported: 2026-03-11 14:07:28 UTC_
