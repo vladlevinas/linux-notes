@@ -372,10 +372,11 @@
 - [431. xmodmap](notes/xmodmap.md)
 - [432. xwinwrap](notes/xwinwrap.md)
 - [433. xxhsum](notes/xxhsum.md)
-- [434. ydotool](notes/ydotool.md)
-- [435. yplan](notes/yplan.md)
-- [436. yum-config-manager](notes/yum-config-manager.md)
-- [437. zenity](notes/zenity.md)
+- [434. yaourt](notes/yaourt.md)
+- [435. ydotool](notes/ydotool.md)
+- [436. yplan](notes/yplan.md)
+- [437. yum-config-manager](notes/yum-config-manager.md)
+- [438. zenity](notes/zenity.md)
 - [44. blastp](notes/blastp.md)
 - [45. blight](notes/blight.md)
 - [46. blkid](notes/blkid.md)
@@ -438,4 +439,4 @@
 - [98. dphys-swapfile](notes/dphys-swapfile.md)
 - [99. dpkg-query](notes/dpkg-query.md)
 
-_Last updated: 2026-04-03 08:03:50 UTC_
+_Last updated: 2026-04-03 14:02:52 UTC_
