@@ -398,7 +398,8 @@
 - [455. ydotool](notes/ydotool.md)
 - [456. yplan](notes/yplan.md)
 - [457. yum-config-manager](notes/yum-config-manager.md)
-- [458. zenity](notes/zenity.md)
+- [458. zathura](notes/zathura.md)
+- [459. zenity](notes/zenity.md)
 - [46. blastp](notes/blastp.md)
 - [47. blight](notes/blight.md)
 - [48. blkid](notes/blkid.md)
@@ -459,4 +460,4 @@
 - [98. dmidecode](notes/dmidecode.md)
 - [99. dnf-changelog](notes/dnf-changelog.md)
 
-_Last updated: 2026-04-10 08:21:55 UTC_
+_Last updated: 2026-04-10 14:18:07 UTC_
