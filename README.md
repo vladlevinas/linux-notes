@@ -432,6 +432,7 @@
 - [486. yum-config-manager](notes/yum-config-manager.md)
 - [487. zathura](notes/zathura.md)
 - [488. zenity](notes/zenity.md)
+- [489. zypper](notes/zypper.md)
 - [49. blight](notes/blight.md)
 - [5. aa-decode](notes/aa-decode.md)
 - [50. blkid](notes/blkid.md)
@@ -489,4 +490,4 @@
 - [98. distrobox-export](notes/distrobox-export.md)
 - [99. distrobox-upgrade](notes/distrobox-upgrade.md)
 
-_Last updated: 2026-04-20 09:09:15 UTC_
+_Last updated: 2026-04-20 14:53:47 UTC_
