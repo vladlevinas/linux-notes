@@ -1,0 +1,40 @@
+# rc-service
+
+> Source: TLDR (MIT) — from 'vendor/tldr/'
+
+# rc-service
+
+> Locate and run OpenRC services with arguments.
+> See also: `openrc`.
+> More information: <https://manned.org/rc-service>.
+
+- Show a service's status:
+
+`rc-service {{service_name}} status`
+
+- Start a service:
+
+`sudo rc-service {{service_name}} start`
+
+- Stop a service:
+
+`sudo rc-service {{service_name}} stop`
+
+- Restart a service:
+
+`sudo rc-service {{service_name}} restart`
+
+- Simulate running a service's custom command:
+
+`sudo rc-service {{[-Z|--dry-run]}} {{service_name}} {{command_name}}`
+
+- Actually run a service's custom command:
+
+`sudo rc-service {{service_name}} {{command_name}}`
+
+- Resolve the location of a service definition on disk:
+
+`sudo rc-service {{[-r|--resolve]}} {{service_name}}`
+
+---
+_Imported: 2026-05-14 20:38:18 UTC_
