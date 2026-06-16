@@ -613,12 +613,13 @@
 - [649. xxhsum](notes/xxhsum.md)
 - [65. boltctl](notes/boltctl.md)
 - [650. yaourt](notes/yaourt.md)
-- [651. ydotool](notes/ydotool.md)
-- [652. yplan](notes/yplan.md)
-- [653. yum-config-manager](notes/yum-config-manager.md)
-- [654. zathura](notes/zathura.md)
-- [655. zenity](notes/zenity.md)
-- [656. zypper](notes/zypper.md)
+- [651. yay](notes/yay.md)
+- [652. ydotool](notes/ydotool.md)
+- [653. yplan](notes/yplan.md)
+- [654. yum-config-manager](notes/yum-config-manager.md)
+- [655. zathura](notes/zathura.md)
+- [656. zenity](notes/zenity.md)
+- [657. zypper](notes/zypper.md)
 - [66. bootctl](notes/bootctl.md)
 - [67. bpftrace](notes/bpftrace.md)
 - [68. bsub](notes/bsub.md)
@@ -657,4 +658,4 @@
 - [98. cpufreq-set](notes/cpufreq-set.md)
 - [99. cpuid](notes/cpuid.md)
 
-_Last updated: 2026-06-16 18:05:10 UTC_
+_Last updated: 2026-06-16 21:42:18 UTC_
