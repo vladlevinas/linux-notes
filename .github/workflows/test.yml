@@ -1,0 +1,30 @@
+name: CI                          # Display name in GitHub UI
+
+on:                               # Triggers
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:                      # Least-privilege token permissions
+  contents: read
+
+env:                              # Workflow-level environment variables
+  NODE_VERSION: '20'
+
+jobs:
+  build:                          # Job ID
+    name: Build and Test          # Display name
+    runs-on: ubuntu-latest        # Runner
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - run: npm ci
+      - run: npm test
