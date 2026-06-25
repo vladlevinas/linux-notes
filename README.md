@@ -646,7 +646,8 @@
 - [679. zathura](notes/zathura.md)
 - [68. bpftrace](notes/bpftrace.md)
 - [680. zenity](notes/zenity.md)
-- [681. zypper](notes/zypper.md)
+- [681. zforce](notes/zforce.md)
+- [682. zypper](notes/zypper.md)
 - [69. bsub](notes/bsub.md)
 - [7. aa-genprof](notes/aa-genprof.md)
 - [70. btrbk](notes/btrbk.md)
@@ -682,4 +683,4 @@
 - [98. column](notes/column.md)
 - [99. compress](notes/compress.md)
 
-_Last updated: 2026-06-24 20:49:48 UTC_
+_Last updated: 2026-06-25 10:16:30 UTC_
