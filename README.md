@@ -658,9 +658,10 @@
 - [69. bsub](notes/bsub.md)
 - [690. yum-config-manager](notes/yum-config-manager.md)
 - [691. zathura](notes/zathura.md)
-- [692. zenity](notes/zenity.md)
-- [693. zforce](notes/zforce.md)
-- [694. zypper](notes/zypper.md)
+- [692. zbarcam](notes/zbarcam.md)
+- [693. zenity](notes/zenity.md)
+- [694. zforce](notes/zforce.md)
+- [695. zypper](notes/zypper.md)
 - [7. aa-genprof](notes/aa-genprof.md)
 - [70. btrbk](notes/btrbk.md)
 - [71. btrfs-device](notes/btrfs-device.md)
@@ -695,4 +696,4 @@
 - [98. column](notes/column.md)
 - [99. compress](notes/compress.md)
 
-_Last updated: 2026-06-29 12:01:58 UTC_
+_Last updated: 2026-06-29 16:38:54 UTC_
