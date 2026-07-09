@@ -1,0 +1,28 @@
+# apx-pkgmanagers
+
+> Source: TLDR (MIT) — from 'vendor/tldr/'
+
+# apx pkgmanagers
+
+> Manage package managers in `apx`.
+> Note: User-created package manager configurations are stored in `~/.local/share/apx/pkgmanagers`.
+> More information: <https://github.com/Vanilla-OS/apx>.
+
+- Interactively create a new package manager configuration:
+
+`apx pkgmanagers create`
+
+- List all available package manager confirgurations:
+
+`apx pkgmanagers list`
+
+- Remove a package manager configuration:
+
+`apx pkgmanagers rm --name {{string}}`
+
+- Display information about a specific package manager:
+
+`apx pkgmanagers show {{name}}`
+
+---
+_Imported: 2026-07-09 20:49:17 UTC_
