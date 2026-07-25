@@ -742,12 +742,13 @@
 - [765. ydotool](notes/ydotool.md)
 - [766. yplan](notes/yplan.md)
 - [767. yum-config-manager](notes/yum-config-manager.md)
-- [768. zathura](notes/zathura.md)
-- [769. zbarcam](notes/zbarcam.md)
+- [768. yumdownloader](notes/yumdownloader.md)
+- [769. zathura](notes/zathura.md)
 - [77. bsub](notes/bsub.md)
-- [770. zenity](notes/zenity.md)
-- [771. zforce](notes/zforce.md)
-- [772. zypper](notes/zypper.md)
+- [770. zbarcam](notes/zbarcam.md)
+- [771. zenity](notes/zenity.md)
+- [772. zforce](notes/zforce.md)
+- [773. zypper](notes/zypper.md)
 - [78. btrbk](notes/btrbk.md)
 - [79. btrfs-device](notes/btrfs-device.md)
 - [8. aa-genprof](notes/aa-genprof.md)
@@ -773,4 +774,4 @@
 - [98. chage](notes/chage.md)
 - [99. chattr](notes/chattr.md)
 
-_Last updated: 2026-07-25 09:01:53 UTC_
+_Last updated: 2026-07-25 14:38:47 UTC_
