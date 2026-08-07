@@ -790,9 +790,10 @@
 - [808. zathura](notes/zathura.md)
 - [809. zbarcam](notes/zbarcam.md)
 - [81. btrbk](notes/btrbk.md)
-- [810. zenity](notes/zenity.md)
-- [811. zforce](notes/zforce.md)
-- [812. zypper](notes/zypper.md)
+- [810. zdump](notes/zdump.md)
+- [811. zenity](notes/zenity.md)
+- [812. zforce](notes/zforce.md)
+- [813. zypper](notes/zypper.md)
 - [82. btrfs-balance](notes/btrfs-balance.md)
 - [83. btrfs-device](notes/btrfs-device.md)
 - [84. btrfs-inspect-internal](notes/btrfs-inspect-internal.md)
@@ -813,4 +814,4 @@
 - [98. cewl](notes/cewl.md)
 - [99. cfdisk](notes/cfdisk.md)
 
-_Last updated: 2026-08-07 14:14:08 UTC_
+_Last updated: 2026-08-07 19:52:54 UTC_
