@@ -1,0 +1,24 @@
+# xcursorgen
+
+> Source: TLDR (MIT) — from 'vendor/tldr/'
+
+# xcursorgen
+
+> Create an X cursor file from a collection of PNGs.
+> If `--prefix` is omitted, the image files must be located in the current working directory.
+> More information: <https://manned.org/xcursorgen>.
+
+- Create an X cursor file using a configuration file:
+
+`xcursorgen {{path/to/config.cursor}} {{path/to/output_file}}`
+
+- Create an X cursor file using a configuration file and specify the path to the image files:
+
+`xcursorgen --prefix {{path/to/image_directory}}/ {{path/to/config.cursor}} {{path/to/output_file}}`
+
+- Create an X cursor file using a configuration file and write the output to `stdout`:
+
+`xcursorgen {{path/to/config.cursor}}`
+
+---
+_Imported: 2026-08-10 19:55:20 UTC_
