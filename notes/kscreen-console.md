@@ -1,0 +1,39 @@
+# kscreen-console
+
+> Source: TLDR (MIT) — from 'vendor/tldr/'
+
+# kscreen-console
+
+> Query KScreen's status.
+> More information: <https://manned.org/kscreen-console>.
+
+- Show all outputs and configuration files to attach to a bug report:
+
+`kscreen-console bug`
+
+- Show paths to KScreen configuration files:
+
+`kscreen-console config`
+
+- Show KScreen output information and configuration:
+
+`kscreen-console outputs`
+
+- Monitor for changes:
+
+`kscreen-console monitor`
+
+- Show the current KScreen configuration as JSON:
+
+`kscreen-console json`
+
+- Display help:
+
+`kscreen-console {{[-h|--help]}}`
+
+- Display help including Qt specific command-line options:
+
+`kscreen-console --help-all`
+
+---
+_Imported: 2026-08-13 14:22:51 UTC_
