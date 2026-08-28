@@ -1,0 +1,31 @@
+# pactree
+
+> Source: TLDR (MIT) — from 'vendor/tldr/'
+
+# pactree
+
+> Package dependency tree viewer for pacman.
+> More information: <https://manned.org/pactree.8>.
+
+- Print the dependency tree of a specific package:
+
+`pactree {{package}}`
+
+- Print what packages depend on a specific package:
+
+`pactree {{[-r|--reverse]}} {{package}}`
+
+- Dump dependencies one per line, skipping duplicates:
+
+`pactree {{[-u|--unique]}} {{package}}`
+
+- Include optional dependencies of a specific package and colorize the output:
+
+`pactree {{[-co|--color --optional]}} {{package}}`
+
+- Display help:
+
+`pactree`
+
+---
+_Imported: 2026-08-28 19:19:51 UTC_
