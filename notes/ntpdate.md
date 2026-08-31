@@ -1,0 +1,27 @@
+# ntpdate
+
+> Source: TLDR (MIT) — from 'vendor/tldr/'
+
+# ntpdate
+
+> Synchronize and set the date and time via NTP.
+> More information: <https://manned.org/ntpdate>.
+
+- Synchronize and set date and time:
+
+`sudo ntpdate {{host}}`
+
+- Query the host without setting the time:
+
+`ntpdate -q {{host}}`
+
+- Use an unprivileged port in case a firewall is blocking privileged ports:
+
+`sudo ntpdate -u {{host}}`
+
+- Force time to be stepped using `settimeofday` instead of `slewed`:
+
+`sudo ntpdate -b {{host}}`
+
+---
+_Imported: 2026-08-31 14:56:32 UTC_
