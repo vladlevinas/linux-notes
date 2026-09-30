@@ -1,0 +1,23 @@
+# koji-buildinfo
+
+> Source: TLDR (MIT) — from 'vendor/tldr/'
+
+# koji buildinfo
+
+> Print basic information about a build.
+> More information: <https://docs.pagure.org/koji>.
+
+- Print basic information:
+
+`koji buildinfo {{BuildID_or_NVR1 BuildID_or_NRV2 ...}}`
+
+- Print basic information with changelog:
+
+`koji buildinfo {{BuildID_or_NVR1 BuildID_or_NRV2 ...}} --changelog`
+
+- Display help:
+
+`koji buildinfo --help`
+
+---
+_Imported: 2026-09-30 13:27:59 UTC_
