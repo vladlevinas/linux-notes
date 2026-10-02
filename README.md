@@ -963,9 +963,10 @@
 - [964. zdump](notes/zdump.md)
 - [965. zenity](notes/zenity.md)
 - [966. zforce](notes/zforce.md)
-- [967. zypper](notes/zypper.md)
+- [967. zile](notes/zile.md)
+- [968. zypper](notes/zypper.md)
 - [97. btrfs-scrub](notes/btrfs-scrub.md)
 - [98. btrfs-subvolume](notes/btrfs-subvolume.md)
 - [99. btrfs](notes/btrfs.md)
 
-_Last updated: 2026-10-02 13:41:29 UTC_
+_Last updated: 2026-10-02 22:51:15 UTC_
